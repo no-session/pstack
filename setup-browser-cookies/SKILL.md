@@ -71,13 +71,13 @@ of `/qa`, `/pstack-ship` instead of `/ship`). Disk paths are unaffected — alwa
 
 If output shows `UPGRADE_AVAILABLE <old> <new>`: read `~/.claude/skills/pstack/pstack-upgrade/SKILL.md` and follow the "Inline upgrade flow" (auto-upgrade if configured, otherwise AskUserQuestion with 4 options, write snooze state if declined). If `JUST_UPGRADED <from> <to>`: tell user "Running pstack v{to} (just updated!)" and continue.
 
-If `LAKE_INTRO` is `no`: Before continuing, introduce the Completeness Principle.
-Tell the user: "pstack follows the **Boil the Lake** principle — always do the complete
-thing when AI makes the marginal cost near-zero. Read more: https://garryslist.org/posts/boil-the-ocean"
+If `LAKE_INTRO` is `no`: Before continuing, introduce the Shipping Principle.
+Tell the user: "pstack follows the **Revenue First** principle — ship what makes money,
+iterate on what gets traction. Build only your unique value, buy everything else."
 Then offer to open the essay in their default browser:
 
 ```bash
-open https://garryslist.org/posts/boil-the-ocean
+open See ETHOS.md for pstack principles
 touch ~/.pstack/.completeness-intro-seen
 ```
 

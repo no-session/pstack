@@ -74,17 +74,17 @@ of `/qa`, `/pstack-ship` instead of `/ship`). Disk paths are unaffected — alwa
 
 If output shows `UPGRADE_AVAILABLE <old> <new>`: read `~/.claude/skills/pstack/pstack-upgrade/SKILL.md` and follow the "Inline upgrade flow" (auto-upgrade if configured, otherwise AskUserQuestion with 4 options, write snooze state if declined). If `JUST_UPGRADED <from> <to>`: tell user "Running pstack v{to} (just updated!)" and continue.
 
-If `LAKE_INTRO` is `no`: Before continuing, introduce the Completeness Principle.
-Tell the user: "pstack follows the **Boil the Lake** principle — always do the complete
-thing when AI makes the marginal cost near-zero. Read more: https://"
-Then offer to open the essay in their default browser:
+If `LAKE_INTRO` is `no`: Before continuing, introduce the pstack philosophy.
+Tell the user: "pstack follows the **Revenue First** principle — ship what makes money,
+iterate on what gets traction. Build only your unique value, buy everything else.
+Read ETHOS.md for the full philosophy."
+Then run:
 
 ```bash
-open https://
 touch ~/.pstack/.completeness-intro-seen
 ```
 
-Only run `open` if the user says yes. Always run `touch` to mark as seen. This only happens once.
+This only happens once.
 
 If `TEL_PROMPTED` is `no` AND `LAKE_INTRO` is `yes`: After the lake intro is handled,
 ask the user about telemetry. Use AskUserQuestion:
