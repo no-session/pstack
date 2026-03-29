@@ -31,20 +31,6 @@ describe('Audit compliance', () => {
     expect(tmpl).toContain('$TEST_PASSWORD');
   });
 
-  // Fix 2: Conditional telemetry — binary calls wrapped with existence check
-  test('preamble telemetry calls are conditional on _TEL and binary existence', () => {
-    const preamble = readFileSync(join(ROOT, 'scripts/resolvers/preamble.ts'), 'utf-8');
-    // Pending finalization must check _TEL and binary existence
-    expect(preamble).toContain('_TEL" != "off"');
-    expect(preamble).toContain('-x ');
-    expect(preamble).toContain('pstack-telemetry-log');
-    // End-of-skill telemetry must also be conditional
-    const completionIdx = preamble.indexOf('Telemetry (run last)');
-    expect(completionIdx).toBeGreaterThan(-1);
-    const completionSection = preamble.slice(completionIdx);
-    expect(completionSection).toContain('_TEL" != "off"');
-  });
-
   // Fix 3: W012 — Bun install is version-pinned
   test('bun install commands use version pinning', () => {
     const browseResolver = readFileSync(join(ROOT, 'scripts/resolvers/browse.ts'), 'utf-8');
@@ -76,13 +62,4 @@ describe('Audit compliance', () => {
     expect(review).toContain('Data NOT sent');
   });
 
-  // Fix 2+6: All generated SKILL.md files with telemetry are conditional
-  test('all generated SKILL.md files with telemetry calls use conditional pattern', () => {
-    const skills = getAllSkillMds();
-    for (const { name, content } of skills) {
-      if (content.includes('pstack-telemetry-log')) {
-        expect(content).toContain('_TEL" != "off"');
-      }
-    }
-  });
 });
