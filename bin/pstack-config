@@ -1,0 +1,52 @@
+#!/usr/bin/env bash
+# pstack-config — read/write ~/.pstack/config.yaml
+#
+# Usage:
+#   pstack-config get <key>          — read a config value
+#   pstack-config set <key> <value>  — write a config value
+#   pstack-config list               — show all config
+#
+# Env overrides (for testing):
+#   PSTACK_STATE_DIR  — override ~/.pstack state directory
+set -euo pipefail
+
+STATE_DIR="${PSTACK_STATE_DIR:-$HOME/.pstack}"
+CONFIG_FILE="$STATE_DIR/config.yaml"
+
+case "${1:-}" in
+  get)
+    KEY="${2:?Usage: pstack-config get <key>}"
+    # Validate key (alphanumeric + underscore only)
+    if ! printf '%s' "$KEY" | grep -qE '^[a-zA-Z0-9_]+$'; then
+      echo "Error: key must contain only alphanumeric characters and underscores" >&2
+      exit 1
+    fi
+    grep -F "${KEY}:" "$CONFIG_FILE" 2>/dev/null | tail -1 | awk '{print $2}' | tr -d '[:space:]' || true
+    ;;
+  set)
+    KEY="${2:?Usage: pstack-config set <key> <value>}"
+    VALUE="${3:?Usage: pstack-config set <key> <value>}"
+    # Validate key (alphanumeric + underscore only)
+    if ! printf '%s' "$KEY" | grep -qE '^[a-zA-Z0-9_]+$'; then
+      echo "Error: key must contain only alphanumeric characters and underscores" >&2
+      exit 1
+    fi
+    mkdir -p "$STATE_DIR"
+    # Escape sed special chars in value and drop embedded newlines
+    ESC_VALUE="$(printf '%s' "$VALUE" | head -1 | sed 's/[&/\]/\\&/g')"
+    if grep -qF "${KEY}:" "$CONFIG_FILE" 2>/dev/null; then
+      # Portable in-place edit (BSD sed uses -i '', GNU sed uses -i without arg)
+      _tmpfile="$(mktemp "${CONFIG_FILE}.XXXXXX")"
+      sed "s/^${KEY}:.*/${KEY}: ${ESC_VALUE}/" "$CONFIG_FILE" > "$_tmpfile" && mv "$_tmpfile" "$CONFIG_FILE"
+    else
+      echo "${KEY}: ${VALUE}" >> "$CONFIG_FILE"
+    fi
+    ;;
+  list)
+    cat "$CONFIG_FILE" 2>/dev/null || true
+    ;;
+  *)
+    echo "Usage: pstack-config {get|set|list} [key] [value]"
+    exit 1
+    ;;
+esac
