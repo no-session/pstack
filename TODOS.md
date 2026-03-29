@@ -1,14 +1,14 @@
 # pstack TODOs
 
 ## Phase 1 — Foundation (current)
-- [x] Fork gstack, strip team/enterprise skills
-- [x] Rename gstack → pstack globally
+- [x] Fork gstack, rename all references to pstack
 - [x] Write bootstrapper-focused ETHOS.md
 - [x] Write new README.md
 - [x] Clean package.json, CHANGELOG, VERSION
 - [ ] Adapt /office-hours for solo founder mode (remove YC-specific framing)
 - [ ] Adapt /ship for push-to-main workflow (no PR by default)
 - [ ] Adapt /plan-ceo-review to focus on revenue/market validation
+- [ ] Adapt /retro for solo developer (remove team breakdowns, add revenue tracking)
 - [ ] Test setup script works end-to-end
 - [ ] Build binaries with bun
 
@@ -22,5 +22,5 @@
 ## Phase 3 — Polish
 - [ ] Update ARCHITECTURE.md for pstack changes
 - [ ] Write CONTRIBUTING.md for pstack contributors
-- [ ] Remove dead references to dropped skills in remaining files
 - [ ] Add pstack-specific test fixtures
+- [ ] Update README with full 29-skill table
