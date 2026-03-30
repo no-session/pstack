@@ -1164,14 +1164,14 @@ Focus on architecture, code quality, tests, and performance sections.`,
 
 // --- Retro E2E ---
 
-describeIfSelected('Retro E2E', ['retro'], () => {
-  let retroDir: string;
+describeIfSelected('Reflect E2E', ['reflect'], () => {
+  let reflectDir: string;
 
   beforeAll(() => {
-    retroDir = fs.mkdtempSync(path.join(os.tmpdir(), 'skill-e2e-retro-'));
+    reflectDir = fs.mkdtempSync(path.join(os.tmpdir(), 'skill-e2e-reflect-'));
     const { spawnSync } = require('child_process');
     const run = (cmd: string, args: string[]) =>
-      spawnSync(cmd, args, { cwd: retroDir, stdio: 'pipe', timeout: 5000 });
+      spawnSync(cmd, args, { cwd: reflectDir, stdio: 'pipe', timeout: 5000 });
 
     // Create a git repo with varied commit history
     run('git', ['init', '-b', 'main']);
@@ -1179,71 +1179,71 @@ describeIfSelected('Retro E2E', ['retro'], () => {
     run('git', ['config', 'user.name', 'Dev']);
 
     // Day 1 commits
-    fs.writeFileSync(path.join(retroDir, 'app.ts'), 'console.log("hello");\n');
+    fs.writeFileSync(path.join(reflectDir, 'app.ts'), 'console.log("hello");\n');
     run('git', ['add', 'app.ts']);
     run('git', ['commit', '-m', 'feat: initial app setup', '--date', '2026-03-10T09:00:00']);
 
-    fs.writeFileSync(path.join(retroDir, 'auth.ts'), 'export function login() {}\n');
+    fs.writeFileSync(path.join(reflectDir, 'auth.ts'), 'export function login() {}\n');
     run('git', ['add', 'auth.ts']);
     run('git', ['commit', '-m', 'feat: add auth module', '--date', '2026-03-10T11:00:00']);
 
     // Day 2 commits
-    fs.writeFileSync(path.join(retroDir, 'app.ts'), 'import { login } from "./auth";\nconsole.log("hello");\nlogin();\n');
+    fs.writeFileSync(path.join(reflectDir, 'app.ts'), 'import { login } from "./auth";\nconsole.log("hello");\nlogin();\n');
     run('git', ['add', 'app.ts']);
     run('git', ['commit', '-m', 'fix: wire up auth to app', '--date', '2026-03-11T10:00:00']);
 
-    fs.writeFileSync(path.join(retroDir, 'test.ts'), 'import { test } from "bun:test";\ntest("login", () => {});\n');
+    fs.writeFileSync(path.join(reflectDir, 'test.ts'), 'import { test } from "bun:test";\ntest("login", () => {});\n');
     run('git', ['add', 'test.ts']);
     run('git', ['commit', '-m', 'test: add login test', '--date', '2026-03-11T14:00:00']);
 
     // Day 3 commits
-    fs.writeFileSync(path.join(retroDir, 'api.ts'), 'export function getUsers() { return []; }\n');
+    fs.writeFileSync(path.join(reflectDir, 'api.ts'), 'export function getUsers() { return []; }\n');
     run('git', ['add', 'api.ts']);
     run('git', ['commit', '-m', 'feat: add users API endpoint', '--date', '2026-03-12T09:30:00']);
 
-    fs.writeFileSync(path.join(retroDir, 'README.md'), '# My App\nA test application.\n');
+    fs.writeFileSync(path.join(reflectDir, 'README.md'), '# My App\nA test application.\n');
     run('git', ['add', 'README.md']);
     run('git', ['commit', '-m', 'docs: add README', '--date', '2026-03-12T16:00:00']);
 
-    // Copy retro skill
-    fs.mkdirSync(path.join(retroDir, 'retro'), { recursive: true });
+    // Copy reflect skill
+    fs.mkdirSync(path.join(reflectDir, 'reflect'), { recursive: true });
     fs.copyFileSync(
-      path.join(ROOT, 'retro', 'SKILL.md'),
-      path.join(retroDir, 'retro', 'SKILL.md'),
+      path.join(ROOT, 'reflect', 'SKILL.md'),
+      path.join(reflectDir, 'reflect', 'SKILL.md'),
     );
   });
 
   afterAll(() => {
-    try { fs.rmSync(retroDir, { recursive: true, force: true }); } catch {}
+    try { fs.rmSync(reflectDir, { recursive: true, force: true }); } catch {}
   });
 
-  test('/retro produces analysis from git history', async () => {
+  test('/reflect produces analysis from git history', async () => {
     const result = await runSkillTest({
       prompt: `Read retro/SKILL.md for instructions on how to run a retrospective.
 
-Run /retro for the last 7 days of this git repo. Skip any AskUserQuestion calls — this is non-interactive.
-Write your retrospective report to ${retroDir}/retro-output.md
+Run /reflect for the last 7 days of this git repo. Skip any AskUserQuestion calls — this is non-interactive.
+Write your retrospective report to ${reflectDir}/reflect-output.md
 
 Analyze the git history and produce the narrative report as described in the SKILL.md.`,
-      workingDirectory: retroDir,
+      workingDirectory: reflectDir,
       maxTurns: 30,
       timeout: 300_000,
-      testName: 'retro',
+      testName: 'reflect',
       runId,
     });
 
-    logCost('/retro', result);
-    recordE2E('/retro', 'Retro E2E', result, {
+    logCost('/reflect', result);
+    recordE2E('/reflect', 'Reflect E2E', result, {
       passed: ['success', 'error_max_turns'].includes(result.exitReason),
     });
-    // Accept error_max_turns — retro does many git commands to analyze history
+    // Accept error_max_turns — reflect does many git commands to analyze history
     expect(['success', 'error_max_turns']).toContain(result.exitReason);
 
-    // Verify the retro was written
-    const retroPath = path.join(retroDir, 'retro-output.md');
-    if (fs.existsSync(retroPath)) {
-      const retro = fs.readFileSync(retroPath, 'utf-8');
-      expect(retro.length).toBeGreaterThan(100);
+    // Verify the reflect was written
+    const reflectPath = path.join(reflectDir, 'reflect-output.md');
+    if (fs.existsSync(reflectPath)) {
+      const reflectOut = fs.readFileSync(reflectPath, 'utf-8');
+      expect(reflectOut.length).toBeGreaterThan(100);
     }
   }, 420_000);
 });
@@ -1577,7 +1577,7 @@ Write your review to ${planDir}/review-output.md`,
 
 // --- Base branch detection smoke tests ---
 
-describeIfSelected('Base branch detection', ['review-base-branch', 'ship-base-branch', 'retro-base-branch'], () => {
+describeIfSelected('Base branch detection', ['review-base-branch', 'ship-base-branch', 'reflect-base-branch'], () => {
   let baseBranchDir: string;
   const run = (cmd: string, args: string[], cwd: string) =>
     spawnSync(cmd, args, { cwd, stdio: 'pipe', timeout: 5000 });
@@ -1705,8 +1705,8 @@ Write a summary of what you detected to ${dir}/ship-preflight.md including:
     expect(destructiveTools).toHaveLength(0);
   }, 90_000);
 
-  testIfSelected('retro-base-branch', async () => {
-    const dir = path.join(baseBranchDir, 'retro-base');
+  testIfSelected('reflect-base-branch', async () => {
+    const dir = path.join(baseBranchDir, 'reflect-base');
     fs.mkdirSync(dir, { recursive: true });
 
     // Create git repo with commit history
@@ -1726,9 +1726,9 @@ Write a summary of what you detected to ${dir}/ship-preflight.md including:
     run('git', ['add', 'test.ts'], dir);
     run('git', ['commit', '-m', 'test: add tests', '--date', '2026-03-16T11:00:00'], dir);
 
-    // Copy retro skill
-    fs.mkdirSync(path.join(dir, 'retro'), { recursive: true });
-    fs.copyFileSync(path.join(ROOT, 'retro', 'SKILL.md'), path.join(dir, 'retro', 'SKILL.md'));
+    // Copy reflect skill
+    fs.mkdirSync(path.join(dir, 'reflect'), { recursive: true });
+    fs.copyFileSync(path.join(ROOT, 'reflect', 'SKILL.md'), path.join(dir, 'reflect', 'SKILL.md'));
 
     const result = await runSkillTest({
       prompt: `Read retro/SKILL.md for instructions on how to run a retrospective.
@@ -1736,27 +1736,27 @@ Write a summary of what you detected to ${dir}/ship-preflight.md including:
 IMPORTANT: Follow the "Detect default branch" step first. Since there is no remote, gh will fail — fall back to main.
 Then use the detected branch name for all git queries.
 
-Run /retro for the last 7 days of this git repo. Skip any AskUserQuestion calls — this is non-interactive.
+Run /reflect for the last 7 days of this git repo. Skip any AskUserQuestion calls — this is non-interactive.
 This is a local-only repo so use the local branch (main) instead of origin/main for all git log commands.
 
-Write your retrospective to ${dir}/retro-output.md`,
+Write your retrospective to ${dir}/reflect-output.md`,
       workingDirectory: dir,
       maxTurns: 25,
       timeout: 240_000,
-      testName: 'retro-base-branch',
+      testName: 'reflect-base-branch',
       runId,
     });
 
-    logCost('/retro base-branch', result);
-    recordE2E('/retro default branch detection', 'Base branch detection', result, {
+    logCost('/reflect base-branch', result);
+    recordE2E('/reflect default branch detection', 'Base branch detection', result, {
       passed: ['success', 'error_max_turns'].includes(result.exitReason),
     });
     expect(['success', 'error_max_turns']).toContain(result.exitReason);
 
-    // Verify retro output was produced
-    const retroPath = path.join(dir, 'retro-output.md');
-    if (fs.existsSync(retroPath)) {
-      const content = fs.readFileSync(retroPath, 'utf-8');
+    // Verify reflect output was produced
+    const reflectPath = path.join(dir, 'reflect-output.md');
+    if (fs.existsSync(reflectPath)) {
+      const content = fs.readFileSync(reflectPath, 'utf-8');
       expect(content.length).toBeGreaterThan(100);
     }
   }, 300_000);
@@ -3193,7 +3193,7 @@ Write the full output (including the GATE verdict) to ${codexDir}/codex-output.m
 
 // --- Office Hours Spec Review E2E ---
 
-describeIfSelected('Office Hours Spec Review E2E', ['office-hours-spec-review'], () => {
+describeIfSelected('Office Hours Spec Review E2E', ['validate-spec-review'], () => {
   let ohDir: string;
 
   beforeAll(() => {
@@ -3208,11 +3208,11 @@ describeIfSelected('Office Hours Spec Review E2E', ['office-hours-spec-review'],
     run('git', ['add', '.']);
     run('git', ['commit', '-m', 'init']);
 
-    // Copy office-hours skill
-    fs.mkdirSync(path.join(ohDir, 'office-hours'), { recursive: true });
+    // Copy validate skill
+    fs.mkdirSync(path.join(ohDir, 'validate'), { recursive: true });
     fs.copyFileSync(
-      path.join(ROOT, 'office-hours', 'SKILL.md'),
-      path.join(ohDir, 'office-hours', 'SKILL.md'),
+      path.join(ROOT, 'validate', 'SKILL.md'),
+      path.join(ohDir, 'validate', 'SKILL.md'),
     );
   });
 
@@ -3220,9 +3220,9 @@ describeIfSelected('Office Hours Spec Review E2E', ['office-hours-spec-review'],
     try { fs.rmSync(ohDir, { recursive: true, force: true }); } catch {}
   });
 
-  test('/office-hours SKILL.md contains spec review loop', async () => {
+  test('/validate SKILL.md contains spec review loop', async () => {
     const result = await runSkillTest({
-      prompt: `Read office-hours/SKILL.md. I want to understand the spec review loop.
+      prompt: `Read validate/SKILL.md. I want to understand the spec review loop.
 
 Summarize what the "Spec Review Loop" section does — specifically:
 1. How many dimensions does the reviewer check?
@@ -3234,12 +3234,12 @@ Write your summary to ${ohDir}/spec-review-summary.md`,
       workingDirectory: ohDir,
       maxTurns: 8,
       timeout: 120_000,
-      testName: 'office-hours-spec-review',
+      testName: 'validate-spec-review',
       runId,
     });
 
-    logCost('/office-hours spec review', result);
-    recordE2E('/office-hours-spec-review', 'Office Hours Spec Review E2E', result);
+    logCost('/validate spec review', result);
+    recordE2E('/validate-spec-review', 'Office Hours Spec Review E2E', result);
     expect(result.exitReason).toBe('success');
 
     const summaryPath = path.join(ohDir, 'spec-review-summary.md');
@@ -3284,10 +3284,10 @@ describeIfSelected('Plan CEO Review Benefits-From E2E', ['plan-ceo-review-benefi
 
   test('/plan-ceo-review SKILL.md contains prerequisite skill offer', async () => {
     const result = await runSkillTest({
-      prompt: `Read plan-ceo-review/SKILL.md. Search for sections about "Prerequisite" or "office-hours" or "design doc found".
+      prompt: `Read plan-ceo-review/SKILL.md. Search for sections about "Prerequisite" or "validate" or "design doc found".
 
 Summarize what happens when no design doc is found — specifically:
-1. Is /office-hours offered as a prerequisite?
+1. Is /validate offered as a prerequisite?
 2. What options does the user get?
 3. Is there a mid-session detection for when the user seems lost?
 

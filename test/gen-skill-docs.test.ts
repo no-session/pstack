@@ -384,14 +384,14 @@ describe('BASE_BRANCH_DETECT resolver', () => {
 });
 
 describe('GitLab support in generated skills', () => {
-  const retroContent = fs.readFileSync(path.join(ROOT, 'retro', 'SKILL.md'), 'utf-8');
+  const retroContent = fs.readFileSync(path.join(ROOT, 'reflect', 'SKILL.md'), 'utf-8');
   const shipSkillContent = fs.readFileSync(path.join(ROOT, 'ship', 'SKILL.md'), 'utf-8');
 
-  test('retro contains GitLab MR number extraction', () => {
+  test('reflect contains GitLab MR number extraction', () => {
     expect(retroContent).toContain('[#!]');
   });
 
-  test('retro uses BASE_BRANCH_DETECT (contains glab)', () => {
+  test('reflect uses BASE_BRANCH_DETECT (contains glab)', () => {
     expect(retroContent).toContain('glab');
   });
 
@@ -899,9 +899,9 @@ describe('Plan file discovery shared helper', () => {
 // --- Retro plan completion ---
 
 describe('Retro plan completion section', () => {
-  const retroSkill = fs.readFileSync(path.join(ROOT, 'retro', 'SKILL.md'), 'utf-8');
+  const retroSkill = fs.readFileSync(path.join(ROOT, 'reflect', 'SKILL.md'), 'utf-8');
 
-  test('retro SKILL.md contains plan completion section', () => {
+  test('reflect SKILL.md contains plan completion section', () => {
     expect(retroSkill).toContain('### Plan Completion');
     expect(retroSkill).toContain('plan_items_total');
     expect(retroSkill).toContain('Plan Completion This Period');
@@ -913,7 +913,7 @@ describe('Retro plan completion section', () => {
 describe('Plan status footer in preamble', () => {
   test('preamble contains plan status footer', () => {
     // Read any skill that uses PREAMBLE
-    const content = fs.readFileSync(path.join(ROOT, 'office-hours', 'SKILL.md'), 'utf-8');
+    const content = fs.readFileSync(path.join(ROOT, 'validate', 'SKILL.md'), 'utf-8');
     expect(content).toContain('Plan Status Footer');
     expect(content).toContain('PSTACK REVIEW REPORT');
     expect(content).toContain('pstack-review-read');
@@ -925,7 +925,7 @@ describe('Plan status footer in preamble', () => {
 // --- {{SPEC_REVIEW_LOOP}} resolver tests ---
 
 describe('SPEC_REVIEW_LOOP resolver', () => {
-  const content = fs.readFileSync(path.join(ROOT, 'office-hours', 'SKILL.md'), 'utf-8');
+  const content = fs.readFileSync(path.join(ROOT, 'validate', 'SKILL.md'), 'utf-8');
 
   test('contains all 5 review dimensions', () => {
     for (const dim of ['Completeness', 'Consistency', 'Clarity', 'Scope', 'Feasibility']) {
@@ -961,7 +961,7 @@ describe('SPEC_REVIEW_LOOP resolver', () => {
 // --- {{DESIGN_SKETCH}} resolver tests ---
 
 describe('DESIGN_SKETCH resolver', () => {
-  const content = fs.readFileSync(path.join(ROOT, 'office-hours', 'SKILL.md'), 'utf-8');
+  const content = fs.readFileSync(path.join(ROOT, 'validate', 'SKILL.md'), 'utf-8');
 
   test('references DESIGN.md for design system constraints', () => {
     expect(content).toContain('DESIGN.md');
@@ -991,10 +991,10 @@ describe('DESIGN_SKETCH resolver', () => {
 // --- {{CODEX_SECOND_OPINION}} resolver tests ---
 
 describe('CODEX_SECOND_OPINION resolver', () => {
-  const content = fs.readFileSync(path.join(ROOT, 'office-hours', 'SKILL.md'), 'utf-8');
-  const codexContent = fs.readFileSync(path.join(ROOT, '.agents', 'skills', 'pstack-office-hours', 'SKILL.md'), 'utf-8');
+  const content = fs.readFileSync(path.join(ROOT, 'validate', 'SKILL.md'), 'utf-8');
+  const codexContent = fs.readFileSync(path.join(ROOT, '.agents', 'skills', 'pstack-validate', 'SKILL.md'), 'utf-8');
 
-  test('Phase 3.5 section appears in office-hours SKILL.md', () => {
+  test('Phase 3.5 section appears in validate SKILL.md', () => {
     expect(content).toContain('Phase 3.5: Cross-Model Second Opinion');
   });
 
@@ -1044,12 +1044,12 @@ describe('Codex filesystem boundary', () => {
   // Skills that call codex exec/review and should contain boundary text
   const CODEX_CALLING_SKILLS = [
     'codex',         // /codex skill — 3 modes
-    'autoplan',      // /autoplan — CEO/design/eng voices
+    'plan',      // /plan — CEO/design/eng voices
     'review',        // /review — adversarial step resolver
     'ship',          // /ship — adversarial step resolver
     'plan-eng-review',  // outside voice resolver
     'plan-ceo-review',  // outside voice resolver
-    'office-hours',     // second opinion resolver
+    'validate',     // second opinion resolver
   ];
 
   const BOUNDARY_MARKER = 'Do NOT read or execute any';
@@ -1085,9 +1085,9 @@ describe('Codex filesystem boundary', () => {
     expect(codexExecIdx).toBeGreaterThan(-1);
   });
 
-  test('autoplan boundary text avoids host-specific paths for cross-host compatibility', () => {
-    const content = fs.readFileSync(path.join(ROOT, 'autoplan', 'SKILL.md.tmpl'), 'utf-8');
-    // autoplan template uses generic 'skills/pstack' pattern instead of host-specific
+  test('plan boundary text avoids host-specific paths for cross-host compatibility', () => {
+    const content = fs.readFileSync(path.join(ROOT, 'plan', 'SKILL.md.tmpl'), 'utf-8');
+    // plan template uses generic 'skills/pstack' pattern instead of host-specific
     // paths like ~/.claude/ or .agents/skills (which break Codex/Claude output tests)
     const boundaryStart = content.indexOf('Filesystem Boundary');
     const boundaryEnd = content.indexOf('---', boundaryStart + 1);
@@ -1107,12 +1107,12 @@ describe('BENEFITS_FROM resolver', () => {
 
   test('plan-ceo-review contains prerequisite skill offer', () => {
     expect(ceoContent).toContain('Prerequisite Skill Offer');
-    expect(ceoContent).toContain('/office-hours');
+    expect(ceoContent).toContain('/validate');
   });
 
   test('plan-eng-review contains prerequisite skill offer', () => {
     expect(engContent).toContain('Prerequisite Skill Offer');
-    expect(engContent).toContain('/office-hours');
+    expect(engContent).toContain('/validate');
   });
 
   test('offer includes graceful decline', () => {
@@ -1130,8 +1130,8 @@ describe('BENEFITS_FROM resolver', () => {
   });
 
   test('inline invocation — read-and-follow path present', () => {
-    expect(ceoContent).toContain('office-hours/SKILL.md');
-    expect(engContent).toContain('office-hours/SKILL.md');
+    expect(ceoContent).toContain('validate/SKILL.md');
+    expect(engContent).toContain('validate/SKILL.md');
   });
 });
 
@@ -1212,7 +1212,7 @@ describe('DESIGN_HARD_RULES resolver', () => {
 // --- Extended DESIGN_SKETCH resolver tests ---
 
 describe('DESIGN_SKETCH extended with outside voices', () => {
-  const content = fs.readFileSync(path.join(ROOT, 'office-hours', 'SKILL.md'), 'utf-8');
+  const content = fs.readFileSync(path.join(ROOT, 'validate', 'SKILL.md'), 'utf-8');
 
   test('contains outside design voices step', () => {
     expect(content).toContain('Outside design voices');
@@ -1400,8 +1400,8 @@ describe('Codex generation (--host codex)', () => {
   });
 
   test('multiline descriptions preserved in Codex output', () => {
-    // office-hours has a multiline description — verify it survives the frontmatter transform
-    const content = fs.readFileSync(path.join(AGENTS_DIR, 'pstack-office-hours', 'SKILL.md'), 'utf-8');
+    // validate has a multiline description — verify it survives the frontmatter transform
+    const content = fs.readFileSync(path.join(AGENTS_DIR, 'pstack-validate', 'SKILL.md'), 'utf-8');
     const fmEnd = content.indexOf('\n---', 4);
     const frontmatter = content.slice(4, fmEnd);
     // Description should span multiple lines (block scalar)

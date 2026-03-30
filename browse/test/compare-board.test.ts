@@ -1,7 +1,7 @@
 /**
  * Integration test for the design comparison board feedback loop.
  *
- * Tests the DOM polling pattern that plan-design-review, office-hours,
+ * Tests the DOM polling pattern that plan-design-review, validate,
  * and design-consultation use to read user feedback from the comparison board.
  *
  * Flow: generate board HTML → open in browser → verify DOM elements →

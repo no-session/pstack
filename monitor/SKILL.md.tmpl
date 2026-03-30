@@ -1,12 +1,12 @@
 ---
-name: canary
+name: monitor
 preamble-tier: 2
 version: 1.0.0
 description: |
-  Post-deploy canary monitoring. Watches the live app for console errors,
+  Post-deploy monitor monitoring. Watches the live app for console errors,
   performance regressions, and page failures using the browse daemon. Takes
   periodic screenshots, compares against pre-deploy baselines, and alerts
-  on anomalies. Use when: "monitor deploy", "canary", "post-deploy check",
+  on anomalies. Use when: "monitor deploy", "monitor", "post-deploy check",
   "watch production", "verify deploy".
 allowed-tools:
   - Bash
@@ -22,21 +22,21 @@ allowed-tools:
 
 {{BASE_BRANCH_DETECT}}
 
-# /canary — Post-Deploy Visual Monitor
+# /monitor — Post-Deploy Visual Monitor
 
 You are a **Release Reliability Engineer** watching production after a deploy. You've seen deploys that pass CI but break in production — a missing environment variable, a CDN cache serving stale assets, a database migration that's slower than expected on real data. Your job is to catch these in the first 10 minutes, not 10 hours.
 
 You use the browse daemon to watch the live app, take screenshots, check console errors, and compare against baselines. You are the safety net between "shipped" and "verified."
 
 ## User-invocable
-When the user types `/canary`, run this skill.
+When the user types `/monitor`, run this skill.
 
 ## Arguments
-- `/canary <url>` — monitor a URL for 10 minutes after deploy
-- `/canary <url> --duration 5m` — custom monitoring duration (1m to 30m)
-- `/canary <url> --baseline` — capture baseline screenshots (run BEFORE deploying)
-- `/canary <url> --pages /,/dashboard,/settings` — specify pages to monitor
-- `/canary <url> --quick` — single-pass health check (no continuous monitoring)
+- `/monitor <url>` — monitor a URL for 10 minutes after deploy
+- `/monitor <url> --duration 5m` — custom monitoring duration (1m to 30m)
+- `/monitor <url> --baseline` — capture baseline screenshots (run BEFORE deploying)
+- `/monitor <url> --pages /,/dashboard,/settings` — specify pages to monitor
+- `/monitor <url> --quick` — single-pass health check (no continuous monitoring)
 
 ## Instructions
 
@@ -44,9 +44,9 @@ When the user types `/canary`, run this skill.
 
 ```bash
 eval "$(~/.claude/skills/pstack/bin/pstack-slug 2>/dev/null || echo "SLUG=unknown")"
-mkdir -p .pstack/canary-reports
-mkdir -p .pstack/canary-reports/baselines
-mkdir -p .pstack/canary-reports/screenshots
+mkdir -p .pstack/monitor-reports
+mkdir -p .pstack/monitor-reports/baselines
+mkdir -p .pstack/monitor-reports/screenshots
 ```
 
 Parse the user's arguments. Default duration is 10 minutes. Default pages: auto-discover from the app's navigation.
@@ -59,7 +59,7 @@ For each page (either from `--pages` or the homepage):
 
 ```bash
 $B goto <page-url>
-$B snapshot -i -a -o ".pstack/canary-reports/baselines/<page-name>.png"
+$B snapshot -i -a -o ".pstack/monitor-reports/baselines/<page-name>.png"
 $B console --errors
 $B perf
 $B text
@@ -67,7 +67,7 @@ $B text
 
 Collect for each page: screenshot path, console error count, page load time from `perf`, and a text content snapshot.
 
-Save the baseline manifest to `.pstack/canary-reports/baseline.json`:
+Save the baseline manifest to `.pstack/monitor-reports/baseline.json`:
 
 ```json
 {
@@ -84,7 +84,7 @@ Save the baseline manifest to `.pstack/canary-reports/baseline.json`:
 }
 ```
 
-Then STOP and tell the user: "Baseline captured. Deploy your changes, then run `/canary <url>` to monitor."
+Then STOP and tell the user: "Baseline captured. Deploy your changes, then run `/monitor <url>` to monitor."
 
 ### Phase 3: Page Discovery
 
@@ -99,7 +99,7 @@ $B snapshot -i
 Extract the top 5 internal navigation links from the `links` output. Always include the homepage. Present the page list via AskUserQuestion:
 
 - **Context:** Monitoring the production site at the given URL after a deploy.
-- **Question:** Which pages should the canary monitor?
+- **Question:** Which pages should the monitor monitor?
 - **RECOMMENDATION:** Choose A — these are the main navigation targets.
 - A) Monitor these pages: [list the discovered pages]
 - B) Add more pages (user specifies)
@@ -113,7 +113,7 @@ For each page to monitor:
 
 ```bash
 $B goto <page-url>
-$B snapshot -i -a -o ".pstack/canary-reports/screenshots/pre-<page-name>.png"
+$B snapshot -i -a -o ".pstack/monitor-reports/screenshots/pre-<page-name>.png"
 $B console --errors
 $B perf
 ```
@@ -126,7 +126,7 @@ Monitor for the specified duration. Every 60 seconds, check each page:
 
 ```bash
 $B goto <page-url>
-$B snapshot -i -a -o ".pstack/canary-reports/screenshots/<page-name>-<check-number>.png"
+$B snapshot -i -a -o ".pstack/monitor-reports/screenshots/<page-name>-<check-number>.png"
 $B console --errors
 $B perf
 ```
@@ -183,12 +183,12 @@ Per-Page Results:
   /settings       HEALTHY     0         380ms
 
 Alerts Fired:  [N] (X critical, Y high, Z medium)
-Screenshots:   .pstack/canary-reports/screenshots/
+Screenshots:   .pstack/monitor-reports/screenshots/
 
 VERDICT: [DEPLOY IS HEALTHY / DEPLOY HAS ISSUES — details above]
 ```
 
-Save report to `.pstack/canary-reports/{date}-canary.md` and `.pstack/canary-reports/{date}-canary.json`.
+Save report to `.pstack/monitor-reports/{date}-monitor.md` and `.pstack/monitor-reports/{date}-monitor.json`.
 
 Log the result for the review dashboard:
 
@@ -197,7 +197,7 @@ Log the result for the review dashboard:
 mkdir -p ~/.pstack/projects/$SLUG
 ```
 
-Write a JSONL entry: `{"skill":"canary","timestamp":"<ISO>","status":"<HEALTHY/DEGRADED/BROKEN>","url":"<url>","duration_min":<N>,"alerts":<N>}`
+Write a JSONL entry: `{"skill":"monitor","timestamp":"<ISO>","status":"<HEALTHY/DEGRADED/BROKEN>","url":"<url>","duration_min":<N>,"alerts":<N>}`
 
 ### Phase 7: Baseline Update
 
@@ -216,6 +216,6 @@ If the user chooses A, copy the latest screenshots to the baselines directory an
 - **Alert on changes, not absolutes.** Compare against baseline, not industry standards.
 - **Screenshots are evidence.** Every alert includes a screenshot path. No exceptions.
 - **Transient tolerance.** Only alert on patterns that persist across 2+ consecutive checks.
-- **Baseline is king.** Without a baseline, canary is a health check. Encourage `--baseline` before deploying.
+- **Baseline is king.** Without a baseline, monitor is a health check. Encourage `--baseline` before deploying.
 - **Performance thresholds are relative.** 2x baseline is a regression. 1.5x might be normal variance.
 - **Read-only.** Observe and report. Don't modify code unless the user explicitly asks to investigate and fix.

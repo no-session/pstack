@@ -46,9 +46,9 @@ Before you write a single line of code, answer: will someone pay for this?
 
 | Skill | What it does |
 |-------|-------------|
-| `/office-hours` | **Start here.** Six forcing questions that expose demand reality. Find the narrowest wedge. GO / KILL / PIVOT decision at the end. |
+| `/validate` | **Start here.** Six forcing questions that expose demand reality. Find the narrowest wedge. GO / KILL / PIVOT decision at the end. |
 
-If `/office-hours` says kill, kill it. Move to the next idea. Speed of killing bad ideas is your edge.
+If `/validate` says kill, kill it. Move to the next idea. Speed of killing bad ideas is your edge.
 
 ### Step 2: Plan — Lock it down, then build
 
@@ -56,12 +56,12 @@ One shot to review the plan from every angle before writing code.
 
 | Skill | What it does |
 |-------|-------------|
-| `/autoplan` | **One command.** Runs CEO + design + eng review back-to-back. Fully reviewed plan, one shot. |
+| `/plan` | **One command.** Runs CEO + design + eng review back-to-back. Fully reviewed plan, one shot. |
 | `/plan-ceo-review` | Challenge your own strategy. Is this a painkiller or a vitamin? Find the 10-star version. |
 | `/plan-design-review` | Rate design dimensions 0-10, explain what a 10 looks like, fix the plan. |
 | `/plan-eng-review` | Lock architecture, data flow, edge cases. Catch problems before they become code. |
 
-Solo founders: run `/autoplan` and move on. Don't over-plan. The plan is a hypothesis — shipping is the experiment.
+Solo founders: run `/plan` and move on. Don't over-plan. The plan is a hypothesis — shipping is the experiment.
 
 ### Step 3: Build — Write code, debug, get a second opinion
 
@@ -104,7 +104,7 @@ You shipped. Now watch it. Console errors, perf regressions, page failures.
 
 | Skill | What it does |
 |-------|-------------|
-| `/canary` | Post-deploy monitoring loop. Watches for errors, regressions, page failures. |
+| `/monitor` | Post-deploy monitoring loop. Watches for errors, regressions, page failures. |
 | `/browse` | Give the agent eyes. Real Chromium browser, real clicks, real screenshots. ~100ms per command. |
 | `/connect-chrome` | Launch your real Chrome controlled by pstack. Watch every action live. |
 
@@ -114,7 +114,7 @@ Weekly. Look at what you shipped, your velocity, your patterns. Then decide: kee
 
 | Skill | What it does |
 |-------|-------------|
-| `/retro` | Weekly retro. What did you ship, commit patterns, code quality trends, shipping streaks. |
+| `/reflect` | Weekly reflect. What did you ship, commit patterns, code quality trends, shipping streaks. |
 
 If the product isn't getting traction after 2-3 loops, go back to Step 1 with a new idea. Kill fast, move fast.
 
@@ -142,14 +142,14 @@ cd ~/.claude/skills/pstack && ./setup
 
 Then in Claude Code:
 ```
-/office-hours     — describe what you're building (Step 1)
-/autoplan         — review the plan from every angle (Step 2)
+/validate     — describe what you're building (Step 1)
+/plan         — review the plan from every angle (Step 2)
   ... build ...   — write code (Step 3)
 /review           — catch bugs before they ship (Step 4)
 /qa               — test in a real browser (Step 4)
 /ship             — push to production (Step 5)
-/canary           — make sure it works (Step 6)
-/retro            — what did I ship this week? (Step 7)
+/monitor           — make sure it works (Step 6)
+/reflect            — what did I ship this week? (Step 7)
 ```
 
 Validate → Plan → Build → Review → Ship → Monitor → Reflect. Kill or loop back. That's the whole workflow.

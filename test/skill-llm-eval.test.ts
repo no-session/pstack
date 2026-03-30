@@ -408,7 +408,7 @@ describeIfSelected('Cross-skill consistency evals', ['cross-skill greptile consi
     const reviewContent = fs.readFileSync(path.join(ROOT, 'review', 'SKILL.md'), 'utf-8');
     const shipContent = fs.readFileSync(path.join(ROOT, 'ship', 'SKILL.md'), 'utf-8');
     const triageContent = fs.readFileSync(path.join(ROOT, 'review', 'greptile-triage.md'), 'utf-8');
-    const retroContent = fs.readFileSync(path.join(ROOT, 'retro', 'SKILL.md'), 'utf-8');
+    const retroContent = fs.readFileSync(path.join(ROOT, 'reflect', 'SKILL.md'), 'utf-8');
 
     const extractGrepLines = (content: string, filename: string) => {
       const lines = content.split('\n')
@@ -421,16 +421,16 @@ describeIfSelected('Cross-skill consistency evals', ['cross-skill greptile consi
       extractGrepLines(reviewContent, 'review/SKILL.md'),
       extractGrepLines(shipContent, 'ship/SKILL.md'),
       extractGrepLines(triageContent, 'review/greptile-triage.md'),
-      extractGrepLines(retroContent, 'retro/SKILL.md'),
+      extractGrepLines(retroContent, 'reflect/SKILL.md'),
     ].join('\n\n');
 
     const result = await callJudge<{ consistent: boolean; issues: string[]; score: number; reasoning: string }>(`You are evaluating whether multiple skill configuration files implement the same data architecture consistently.
 
 INTENDED ARCHITECTURE:
 - greptile-history has TWO paths: per-project (~/.pstack/projects/{slug}/greptile-history.md) and global (~/.pstack/greptile-history.md)
-- /review and /ship WRITE to BOTH paths (per-project for suppressions, global for retro aggregation)
+- /review and /ship WRITE to BOTH paths (per-project for suppressions, global for reflect aggregation)
 - /review and /ship delegate write mechanics to greptile-triage.md
-- /retro READS from the GLOBAL path only (it aggregates across all projects)
+- /reflect READS from the GLOBAL path only (it aggregates across all projects)
 - REMOTE_SLUG derivation should be consistent across files that use it
 
 Below are greptile-related lines extracted from each skill file:
@@ -685,7 +685,7 @@ describeIfSelected('Design skill evals', ['design-review/SKILL.md fix loop', 'de
 
 // Block 4: Deploy skills
 describeIfSelected('Deploy skill evals', [
-  'land-and-deploy/SKILL.md workflow', 'canary/SKILL.md monitoring loop',
+  'land-and-deploy/SKILL.md workflow', 'monitor/SKILL.md monitoring loop',
   'benchmark/SKILL.md perf collection', 'setup-deploy/SKILL.md platform setup',
 ], () => {
   testIfSelected('land-and-deploy/SKILL.md workflow', async () => {
@@ -696,18 +696,18 @@ describeIfSelected('Deploy skill evals', [
       startMarker: '## Step 1: Pre-flight',
       endMarker: '## Important Rules',
       judgeContext: 'a merge-deploy-verify workflow for landing PRs to production',
-      judgeGoal: 'how to merge a PR via GitHub CLI, wait for CI and deploy workflows (with platform-specific strategies for Fly.io/Render/Vercel/Netlify), run canary health checks on production, and offer revert if something breaks — with timing data logged for retrospectives',
+      judgeGoal: 'how to merge a PR via GitHub CLI, wait for CI and deploy workflows (with platform-specific strategies for Fly.io/Render/Vercel/Netlify), run monitor health checks on production, and offer revert if something breaks — with timing data logged for retrospectives',
     });
   }, 30_000);
 
-  testIfSelected('canary/SKILL.md monitoring loop', async () => {
+  testIfSelected('monitor/SKILL.md monitoring loop', async () => {
     await runWorkflowJudge({
-      testName: 'canary/SKILL.md monitoring loop',
+      testName: 'monitor/SKILL.md monitoring loop',
       suite: 'Deploy skill evals',
-      skillPath: 'canary/SKILL.md',
+      skillPath: 'monitor/SKILL.md',
       startMarker: '### Phase 2: Baseline Capture',
       endMarker: '## Important Rules',
-      judgeContext: 'a post-deploy canary monitoring workflow using a headless browser daemon',
+      judgeContext: 'a post-deploy monitor monitoring workflow using a headless browser daemon',
       judgeGoal: 'how to capture baseline screenshots and metrics before deploy, run a continuous monitoring loop checking each page every 60 seconds for console errors and performance regressions, fire alerts with evidence (screenshots), and produce a health report with per-page status and verdict',
     });
   }, 30_000);
@@ -739,17 +739,17 @@ describeIfSelected('Deploy skill evals', [
 
 // Block 5: Other skills
 describeIfSelected('Other skill evals', [
-  'retro/SKILL.md instructions', 'qa-only/SKILL.md workflow', 'pstack-upgrade/SKILL.md upgrade flow',
+  'reflect/SKILL.md instructions', 'qa-only/SKILL.md workflow', 'pstack-upgrade/SKILL.md upgrade flow',
 ], () => {
-  testIfSelected('retro/SKILL.md instructions', async () => {
+  testIfSelected('reflect/SKILL.md instructions', async () => {
     await runWorkflowJudge({
-      testName: 'retro/SKILL.md instructions',
+      testName: 'reflect/SKILL.md instructions',
       suite: 'Other skill evals',
-      skillPath: 'retro/SKILL.md',
+      skillPath: 'reflect/SKILL.md',
       startMarker: '## Instructions',
       endMarker: '## Compare Mode',
       judgeContext: 'an engineering retrospective data gathering and analysis workflow',
-      judgeGoal: 'how to gather git metrics (commit history, test counts, work patterns), analyze them, produce a structured retro report with praise, growth areas, and trend tracking',
+      judgeGoal: 'how to gather git metrics (commit history, test counts, work patterns), analyze them, produce a structured reflect report with praise, growth areas, and trend tracking',
     });
   }, 30_000);
 

@@ -6,11 +6,11 @@ designer, QA lead, release engineer, debugger, and more.
 
 ## Available skills
 
-Skills live in `.agents/skills/`. Invoke them by name (e.g., `/office-hours`).
+Skills live in `.agents/skills/`. Invoke them by name (e.g., `/validate`).
 
 | Skill | What it does |
 |-------|-------------|
-| `/office-hours` | Start here. Reframes your product idea before you write code. |
+| `/validate` | Start here. Reframes your product idea before you write code. |
 | `/plan-ceo-review` | CEO-level review: find the 10-star product in the request. |
 | `/plan-eng-review` | Lock architecture, data flow, edge cases, and tests. |
 | `/plan-design-review` | Rate each design dimension 0-10, explain what a 10 looks like. |
@@ -22,7 +22,7 @@ Skills live in `.agents/skills/`. Invoke them by name (e.g., `/office-hours`).
 | `/qa-only` | Same as /qa but report only — no code changes. |
 | `/ship` | Run tests, review, push, open PR. One command. |
 | `/document-release` | Update all docs to match what you just shipped. |
-| `/retro` | Weekly retro with per-person breakdowns and shipping streaks. |
+| `/retro` | Weekly reflect with per-person breakdowns and shipping streaks. |
 | `/browse` | Headless browser — real Chromium, real clicks, ~100ms/command. |
 | `/setup-browser-cookies` | Import cookies from your real browser for authenticated testing. |
 | `/careful` | Warn before destructive commands (rm -rf, DROP TABLE, force-push). |

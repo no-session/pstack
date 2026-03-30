@@ -167,7 +167,7 @@ Then write a `## PSTACK REVIEW REPORT` section to the end of the plan file:
 | Eng Review | \`/plan-eng-review\` | Architecture & tests (required) | 0 | — | — |
 | Design Review | \`/plan-design-review\` | UI/UX gaps | 0 | — | — |
 
-**VERDICT:** NO REVIEWS YET — run \`/autoplan\` for full review pipeline, or individual reviews above.
+**VERDICT:** NO REVIEWS YET — run \`/plan\` for full review pipeline, or individual reviews above.
 \`\`\`
 
 **PLAN MODE EXCEPTION — ALWAYS RUN:** This writes to the plan file, which is the one
@@ -180,18 +180,18 @@ Only run skills the user explicitly invokes. This preference persists across ses
 
 If `PROACTIVE` is `true` (default): suggest adjacent pstack skills when relevant to the
 user's workflow stage:
-- Brainstorming → /office-hours
+- Brainstorming → /validate
 - Strategy → /plan-ceo-review
 - Architecture → /plan-eng-review
 - Design → /plan-design-review or /design-consultation
-- Auto-review → /autoplan
+- Auto-review → /plan
 - Debugging → /investigate
 - QA → /qa
 - Code review → /review
 - Visual audit → /design-review
 - Shipping → /ship
 - Docs → /document-release
-- Retro → /retro
+- Reflect → /reflect
 - Second opinion → /codex
 - Prod safety → /careful or /guard
 - Scoped edits → /freeze or /unfreeze

@@ -100,15 +100,15 @@ describe('SKILL.md command validation', () => {
     expect(result.snapshotFlagErrors).toHaveLength(0);
   });
 
-  test('all $B commands in autoplan/SKILL.md are valid browse commands', () => {
-    const skill = path.join(ROOT, 'autoplan', 'SKILL.md');
+  test('all $B commands in plan/SKILL.md are valid browse commands', () => {
+    const skill = path.join(ROOT, 'plan', 'SKILL.md');
     if (!fs.existsSync(skill)) return;
     const result = validateSkill(skill);
     expect(result.invalid).toHaveLength(0);
   });
 
-  test('all snapshot flags in autoplan/SKILL.md are valid', () => {
-    const skill = path.join(ROOT, 'autoplan', 'SKILL.md');
+  test('all snapshot flags in plan/SKILL.md are valid', () => {
+    const skill = path.join(ROOT, 'plan', 'SKILL.md');
     if (!fs.existsSync(skill)) return;
     const result = validateSkill(skill);
     expect(result.snapshotFlagErrors).toHaveLength(0);
@@ -231,13 +231,13 @@ describe('Update check preamble', () => {
     'setup-browser-cookies/SKILL.md',
     'ship/SKILL.md', 'review/SKILL.md',
     'plan-ceo-review/SKILL.md', 'plan-eng-review/SKILL.md',
-    'retro/SKILL.md',
-    'office-hours/SKILL.md', 'investigate/SKILL.md',
+    'reflect/SKILL.md',
+    'validate/SKILL.md', 'investigate/SKILL.md',
     'plan-design-review/SKILL.md',
     'design-review/SKILL.md',
     'design-consultation/SKILL.md',
     'document-release/SKILL.md',
-    'canary/SKILL.md',
+    'monitor/SKILL.md',
     'benchmark/SKILL.md',
     'land-and-deploy/SKILL.md',
     'setup-deploy/SKILL.md',
@@ -329,8 +329,8 @@ describe('Cross-skill path consistency', () => {
     expect(content).toContain('~/.pstack/greptile-history.md');
   });
 
-  test('retro/SKILL.md reads global greptile-history (not per-project)', () => {
-    const content = fs.readFileSync(path.join(ROOT, 'retro', 'SKILL.md'), 'utf-8');
+  test('reflect/SKILL.md reads global greptile-history (not per-project)', () => {
+    const content = fs.readFileSync(path.join(ROOT, 'reflect', 'SKILL.md'), 'utf-8');
     expect(content).toContain('~/.pstack/greptile-history.md');
     // Should NOT reference per-project path for reads
     expect(content).not.toContain('$REMOTE_SLUG/greptile-history.md');
@@ -462,7 +462,7 @@ describe('No hardcoded branch names in SKILL templates', () => {
     'review/SKILL.md.tmpl',
     'qa/SKILL.md.tmpl',
     'plan-ceo-review/SKILL.md.tmpl',
-    'retro/SKILL.md.tmpl',
+    'reflect/SKILL.md.tmpl',
     'document-release/SKILL.md.tmpl',
     'plan-eng-review/SKILL.md.tmpl',
     'plan-design-review/SKILL.md.tmpl',
@@ -550,13 +550,13 @@ describe('v0.4.1 preamble features', () => {
     'qa/SKILL.md', 'qa-only/SKILL.md',
     'ship/SKILL.md', 'review/SKILL.md',
     'plan-ceo-review/SKILL.md', 'plan-eng-review/SKILL.md',
-    'retro/SKILL.md',
-    'office-hours/SKILL.md', 'investigate/SKILL.md',
+    'reflect/SKILL.md',
+    'validate/SKILL.md', 'investigate/SKILL.md',
     'plan-design-review/SKILL.md',
     'design-review/SKILL.md',
     'design-consultation/SKILL.md',
     'document-release/SKILL.md',
-    'canary/SKILL.md',
+    'monitor/SKILL.md',
     'land-and-deploy/SKILL.md',
     'setup-deploy/SKILL.md',
     'cso/SKILL.md',
@@ -591,8 +591,8 @@ describe('v0.4.1 preamble features', () => {
 
 // --- Structural tests for new skills ---
 
-describe('office-hours skill structure', () => {
-  const content = fs.readFileSync(path.join(ROOT, 'office-hours', 'SKILL.md'), 'utf-8');
+describe('validate skill structure', () => {
+  const content = fs.readFileSync(path.join(ROOT, 'validate', 'SKILL.md'), 'utf-8');
 
   // Original structural assertions
   for (const section of ['Phase 1', 'Phase 2', 'Phase 3', 'Phase 4', 'Phase 5', 'Phase 6',
@@ -744,12 +744,12 @@ describe('Contributor mode preamble structure', () => {
     'setup-browser-cookies/SKILL.md',
     'ship/SKILL.md', 'review/SKILL.md',
     'plan-ceo-review/SKILL.md', 'plan-eng-review/SKILL.md',
-    'retro/SKILL.md',
+    'reflect/SKILL.md',
     'plan-design-review/SKILL.md',
     'design-review/SKILL.md',
     'design-consultation/SKILL.md',
     'document-release/SKILL.md',
-    'canary/SKILL.md',
+    'monitor/SKILL.md',
     'benchmark/SKILL.md',
     'land-and-deploy/SKILL.md',
     'setup-deploy/SKILL.md',
@@ -830,7 +830,7 @@ describe('Completeness Principle in generated SKILL.md files', () => {
     'setup-browser-cookies/SKILL.md',
     'ship/SKILL.md', 'review/SKILL.md',
     'plan-ceo-review/SKILL.md', 'plan-eng-review/SKILL.md',
-    'retro/SKILL.md',
+    'reflect/SKILL.md',
     'plan-design-review/SKILL.md',
     'design-review/SKILL.md',
     'design-consultation/SKILL.md',
@@ -932,9 +932,9 @@ describe('CEO review mode validation', () => {
   });
 
   // Skill chaining (benefits-from)
-  test('contains prerequisite skill offer for office-hours', () => {
+  test('contains prerequisite skill offer for validate', () => {
     expect(content).toContain('Prerequisite Skill Offer');
-    expect(content).toContain('/office-hours');
+    expect(content).toContain('/validate');
   });
 
   test('contains mid-session detection', () => {
@@ -1200,28 +1200,28 @@ describe('Step 3.4 test coverage audit', () => {
 // --- Retro test health validation ---
 
 describe('Retro test health tracking', () => {
-  test('retro/SKILL.md has test health data gathering commands', () => {
-    const content = fs.readFileSync(path.join(ROOT, 'retro', 'SKILL.md'), 'utf-8');
+  test('reflect/SKILL.md has test health data gathering commands', () => {
+    const content = fs.readFileSync(path.join(ROOT, 'reflect', 'SKILL.md'), 'utf-8');
     expect(content).toContain('# 10. Test file count');
     expect(content).toContain('# 11. Regression test commits');
     expect(content).toContain('# 12. Test files changed');
   });
 
-  test('retro/SKILL.md has Test Health metrics row', () => {
-    const content = fs.readFileSync(path.join(ROOT, 'retro', 'SKILL.md'), 'utf-8');
+  test('reflect/SKILL.md has Test Health metrics row', () => {
+    const content = fs.readFileSync(path.join(ROOT, 'reflect', 'SKILL.md'), 'utf-8');
     expect(content).toContain('Test Health');
     expect(content).toContain('regression tests');
   });
 
-  test('retro/SKILL.md has Test Health narrative section', () => {
-    const content = fs.readFileSync(path.join(ROOT, 'retro', 'SKILL.md'), 'utf-8');
+  test('reflect/SKILL.md has Test Health narrative section', () => {
+    const content = fs.readFileSync(path.join(ROOT, 'reflect', 'SKILL.md'), 'utf-8');
     expect(content).toContain('### Test Health');
     expect(content).toContain('Total test files');
     expect(content).toContain('vibe coding safe');
   });
 
-  test('retro JSON schema includes test_health field', () => {
-    const content = fs.readFileSync(path.join(ROOT, 'retro', 'SKILL.md'), 'utf-8');
+  test('reflect JSON schema includes test_health field', () => {
+    const content = fs.readFileSync(path.join(ROOT, 'reflect', 'SKILL.md'), 'utf-8');
     expect(content).toContain('test_health');
     expect(content).toContain('total_test_files');
     expect(content).toContain('regression_test_commits');
@@ -1383,9 +1383,9 @@ describe('Skill trigger phrases', () => {
   // Excluded: root pstack (browser tool), pstack-upgrade (pstack-specific),
   // humanizer (text tool)
   const SKILLS_REQUIRING_TRIGGERS = [
-    'qa', 'qa-only', 'ship', 'review', 'investigate', 'office-hours',
+    'qa', 'qa-only', 'ship', 'review', 'investigate', 'validate',
     'plan-ceo-review', 'plan-eng-review', 'plan-design-review',
-    'design-review', 'design-consultation', 'retro', 'document-release',
+    'design-review', 'design-consultation', 'reflect', 'document-release',
     'codex', 'browse', 'setup-browser-cookies',
   ];
 
@@ -1403,9 +1403,9 @@ describe('Skill trigger phrases', () => {
 
   // Skills with proactive triggers should have "Proactively suggest" in description
   const SKILLS_REQUIRING_PROACTIVE = [
-    'qa', 'qa-only', 'ship', 'review', 'investigate', 'office-hours',
+    'qa', 'qa-only', 'ship', 'review', 'investigate', 'validate',
     'plan-ceo-review', 'plan-eng-review', 'plan-design-review',
-    'design-review', 'design-consultation', 'retro', 'document-release',
+    'design-review', 'design-consultation', 'reflect', 'document-release',
   ];
 
   for (const skill of SKILLS_REQUIRING_PROACTIVE) {

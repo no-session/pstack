@@ -242,60 +242,60 @@ Show what the readiness gate output would look like.`,
 
 // --- Canary skill E2E ---
 
-describeIfSelected('Canary skill E2E', ['canary-workflow'], () => {
-  let canaryDir: string;
+describeIfSelected('Canary skill E2E', ['monitor-workflow'], () => {
+  let monitorDir: string;
 
   beforeAll(() => {
-    canaryDir = fs.mkdtempSync(path.join(os.tmpdir(), 'skill-e2e-canary-'));
+    monitorDir = fs.mkdtempSync(path.join(os.tmpdir(), 'skill-e2e-monitor-'));
     const run = (cmd: string, args: string[]) =>
-      spawnSync(cmd, args, { cwd: canaryDir, stdio: 'pipe', timeout: 5000 });
+      spawnSync(cmd, args, { cwd: monitorDir, stdio: 'pipe', timeout: 5000 });
 
     run('git', ['init', '-b', 'main']);
     run('git', ['config', 'user.email', 'test@test.com']);
     run('git', ['config', 'user.name', 'Test']);
 
-    fs.writeFileSync(path.join(canaryDir, 'index.html'), '<h1>Hello</h1>\n');
+    fs.writeFileSync(path.join(monitorDir, 'index.html'), '<h1>Hello</h1>\n');
     run('git', ['add', '.']);
     run('git', ['commit', '-m', 'initial']);
 
-    copyDirSync(path.join(ROOT, 'canary'), path.join(canaryDir, 'canary'));
+    copyDirSync(path.join(ROOT, 'monitor'), path.join(monitorDir, 'monitor'));
   });
 
   afterAll(() => {
-    try { fs.rmSync(canaryDir, { recursive: true, force: true }); } catch {}
+    try { fs.rmSync(monitorDir, { recursive: true, force: true }); } catch {}
   });
 
-  testConcurrentIfSelected('canary-workflow', async () => {
+  testConcurrentIfSelected('monitor-workflow', async () => {
     const result = await runSkillTest({
-      prompt: `Read canary/SKILL.md for the /canary skill instructions.
+      prompt: `Read monitor/SKILL.md for the /monitor skill instructions.
 
-You are simulating a canary check. There is NO browse daemon available and NO production URL.
+You are simulating a monitor check. There is NO browse daemon available and NO production URL.
 
 Instead, demonstrate you understand the workflow:
-1. Create the .pstack/canary-reports/ directory structure
-2. Write a simulated baseline.json to .pstack/canary-reports/baseline.json with the
+1. Create the .pstack/monitor-reports/ directory structure
+2. Write a simulated baseline.json to .pstack/monitor-reports/baseline.json with the
    schema described in Phase 2 of the skill (url, timestamp, branch, pages with
    screenshot path, console_errors count, and load_time_ms)
-3. Write a simulated canary report to .pstack/canary-reports/canary-report.md following
+3. Write a simulated monitor report to .pstack/monitor-reports/monitor-report.md following
    the Phase 6 Health Report format (CANARY REPORT header, duration, pages, status,
    per-page results table, verdict)
 
 Do NOT use AskUserQuestion. Do NOT run browse ($B) commands.
 Just create the directory structure and report files showing the correct schema.`,
-      workingDirectory: canaryDir,
+      workingDirectory: monitorDir,
       maxTurns: 15,
       allowedTools: ['Bash', 'Read', 'Write', 'Edit', 'Glob'],
       timeout: 120_000,
-      testName: 'canary-workflow',
+      testName: 'monitor-workflow',
       runId,
     });
 
-    logCost('/canary', result);
-    recordE2E(evalCollector, '/canary workflow', 'Canary skill E2E', result);
+    logCost('/monitor', result);
+    recordE2E(evalCollector, '/monitor workflow', 'Canary skill E2E', result);
     expect(result.exitReason).toBe('success');
 
-    expect(fs.existsSync(path.join(canaryDir, '.pstack', 'canary-reports'))).toBe(true);
-    const reportDir = path.join(canaryDir, '.pstack', 'canary-reports');
+    expect(fs.existsSync(path.join(monitorDir, '.pstack', 'monitor-reports'))).toBe(true);
+    const reportDir = path.join(monitorDir, '.pstack', 'monitor-reports');
     const files = fs.readdirSync(reportDir, { recursive: true }) as string[];
     expect(files.length).toBeGreaterThan(0);
   }, 180_000);

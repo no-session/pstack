@@ -71,7 +71,7 @@ describe('selectTests', () => {
     expect(result.reason).toBe('diff');
     // Should NOT include unrelated tests
     expect(result.selected).not.toContain('plan-ceo-review');
-    expect(result.selected).not.toContain('retro');
+    expect(result.selected).not.toContain('reflect');
     expect(result.selected).not.toContain('document-release');
   });
 
@@ -80,7 +80,7 @@ describe('selectTests', () => {
     expect(result.selected).toContain('plan-ceo-review');
     expect(result.selected).toContain('plan-ceo-review-selective');
     expect(result.selected).toContain('plan-ceo-review-benefits');
-    expect(result.selected).toContain('autoplan-core');
+    expect(result.selected).toContain('plan-core');
     expect(result.selected).toContain('codex-offered-ceo-review');
     expect(result.selected.length).toBe(5);
     expect(result.skipped.length).toBe(Object.keys(E2E_TOUCHFILES).length - 5);
@@ -104,7 +104,7 @@ describe('selectTests', () => {
     expect(result.selected).toContain('contributor-mode');
     expect(result.selected).toContain('journey-ideation');
     // Should NOT include tests that don't depend on it
-    expect(result.selected).not.toContain('retro');
+    expect(result.selected).not.toContain('reflect');
     expect(result.selected).not.toContain('cso-full-audit');
   });
 
@@ -121,14 +121,14 @@ describe('selectTests', () => {
 
   test('multiple changed files union their selections', () => {
     const result = selectTests(
-      ['plan-ceo-review/SKILL.md', 'retro/SKILL.md.tmpl'],
+      ['plan-ceo-review/SKILL.md', 'reflect/SKILL.md.tmpl'],
       E2E_TOUCHFILES,
     );
     expect(result.selected).toContain('plan-ceo-review');
     expect(result.selected).toContain('plan-ceo-review-selective');
-    expect(result.selected).toContain('retro');
-    expect(result.selected).toContain('retro-base-branch');
-    // Also selects journey routing tests (*/SKILL.md.tmpl matches retro/SKILL.md.tmpl)
+    expect(result.selected).toContain('reflect');
+    expect(result.selected).toContain('reflect-base-branch');
+    // Also selects journey routing tests (*/SKILL.md.tmpl matches reflect/SKILL.md.tmpl)
     expect(result.selected.length).toBeGreaterThanOrEqual(4);
   });
 
@@ -150,7 +150,7 @@ describe('selectTests', () => {
     expect(result.selected).toContain('journey-ideation');
     // Should NOT select unrelated non-routing tests
     expect(result.selected).not.toContain('plan-ceo-review');
-    expect(result.selected).not.toContain('retro');
+    expect(result.selected).not.toContain('reflect');
   });
 
   test('global touchfiles work for LLM-judge tests too', () => {

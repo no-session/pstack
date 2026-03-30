@@ -188,7 +188,7 @@ mkdir -p "$HOME/.pstack/projects/$REMOTE_SLUG"
 mkdir -p ~/.pstack
 ```
 
-Append one line per triage outcome to **both** files (per-project for suppressions, global for retro):
+Append one line per triage outcome to **both** files (per-project for suppressions, global for reflect):
 - `~/.pstack/projects/$REMOTE_SLUG/greptile-history.md` (per-project)
 - `~/.pstack/greptile-history.md` (global aggregate)
 

@@ -60,7 +60,7 @@ export const E2E_TOUCHFILES: Record<string, string[]> = {
   'review-design-lite':       ['review/**', 'test/fixtures/review-eval-design-slop.*'],
 
   // Office Hours
-  'office-hours-spec-review':  ['office-hours/**', 'scripts/gen-skill-docs.ts'],
+  'validate-spec-review':  ['validate/**', 'scripts/gen-skill-docs.ts'],
 
   // Plan reviews
   'plan-ceo-review':           ['plan-ceo-review/**'],
@@ -71,7 +71,7 @@ export const E2E_TOUCHFILES: Record<string, string[]> = {
   'plan-review-report':        ['plan-eng-review/**', 'scripts/gen-skill-docs.ts'],
 
   // Codex offering verification
-  'codex-offered-office-hours':  ['office-hours/**', 'scripts/gen-skill-docs.ts'],
+  'codex-offered-validate':  ['validate/**', 'scripts/gen-skill-docs.ts'],
   'codex-offered-ceo-review':    ['plan-ceo-review/**', 'scripts/gen-skill-docs.ts'],
   'codex-offered-design-review': ['plan-design-review/**', 'scripts/gen-skill-docs.ts'],
   'codex-offered-eng-review':    ['plan-eng-review/**', 'scripts/gen-skill-docs.ts'],
@@ -79,13 +79,13 @@ export const E2E_TOUCHFILES: Record<string, string[]> = {
   // Ship
   'ship-base-branch': ['ship/**', 'bin/pstack-repo-mode'],
   'ship-local-workflow': ['ship/**', 'scripts/gen-skill-docs.ts'],
-  'review-dashboard-via': ['ship/**', 'scripts/resolvers/review.ts', 'codex/**', 'autoplan/**', 'land-and-deploy/**'],
+  'review-dashboard-via': ['ship/**', 'scripts/resolvers/review.ts', 'codex/**', 'plan/**', 'land-and-deploy/**'],
   'ship-plan-completion': ['ship/**', 'scripts/gen-skill-docs.ts'],
   'ship-plan-verification': ['ship/**', 'scripts/gen-skill-docs.ts'],
 
-  // Retro
-  'retro':             ['retro/**'],
-  'retro-base-branch': ['retro/**'],
+  // Reflect
+  'reflect':             ['reflect/**'],
+  'reflect-base-branch': ['reflect/**'],
 
   // Global discover
   'global-discover':   ['bin/pstack-global-discover.ts', 'test/global-discover.test.ts'],
@@ -142,7 +142,7 @@ export const E2E_TOUCHFILES: Record<string, string[]> = {
   'land-and-deploy-workflow':      ['land-and-deploy/**', 'scripts/gen-skill-docs.ts'],
   'land-and-deploy-first-run':     ['land-and-deploy/**', 'scripts/gen-skill-docs.ts', 'bin/pstack-slug'],
   'land-and-deploy-review-gate':   ['land-and-deploy/**', 'bin/pstack-review-read'],
-  'canary-workflow':               ['canary/**', 'browse/src/**'],
+  'monitor-workflow':               ['monitor/**', 'browse/src/**'],
   'benchmark-workflow':            ['benchmark/**', 'browse/src/**'],
   'setup-deploy-workflow':         ['setup-deploy/**', 'scripts/gen-skill-docs.ts'],
 
@@ -151,7 +151,7 @@ export const E2E_TOUCHFILES: Record<string, string[]> = {
   'sidebar-url-accuracy':          ['browse/src/server.ts', 'browse/src/sidebar-agent.ts', 'browse/src/sidebar-utils.ts', 'extension/background.js'],
 
   // Autoplan
-  'autoplan-core':  ['autoplan/**', 'plan-ceo-review/**', 'plan-eng-review/**', 'plan-design-review/**'],
+  'plan-core':  ['plan/**', 'plan-ceo-review/**', 'plan-eng-review/**', 'plan-design-review/**'],
 
   // Skill routing — journey-stage tests (depend on ALL skill descriptions)
   'journey-ideation':       ['*/SKILL.md.tmpl', 'SKILL.md.tmpl', 'scripts/gen-skill-docs.ts'],
@@ -161,7 +161,7 @@ export const E2E_TOUCHFILES: Record<string, string[]> = {
   'journey-code-review':    ['*/SKILL.md.tmpl', 'SKILL.md.tmpl', 'scripts/gen-skill-docs.ts'],
   'journey-ship':           ['*/SKILL.md.tmpl', 'SKILL.md.tmpl', 'scripts/gen-skill-docs.ts'],
   'journey-docs':           ['*/SKILL.md.tmpl', 'SKILL.md.tmpl', 'scripts/gen-skill-docs.ts'],
-  'journey-retro':          ['*/SKILL.md.tmpl', 'SKILL.md.tmpl', 'scripts/gen-skill-docs.ts'],
+  'journey-reflect':          ['*/SKILL.md.tmpl', 'SKILL.md.tmpl', 'scripts/gen-skill-docs.ts'],
   'journey-design-system':  ['*/SKILL.md.tmpl', 'SKILL.md.tmpl', 'scripts/gen-skill-docs.ts'],
   'journey-visual-qa':      ['*/SKILL.md.tmpl', 'SKILL.md.tmpl', 'scripts/gen-skill-docs.ts'],
 };
@@ -201,7 +201,7 @@ export const E2E_TIERS: Record<string, 'gate' | 'periodic'> = {
   'review-dashboard-via': 'gate',
 
   // Office Hours
-  'office-hours-spec-review': 'gate',
+  'validate-spec-review': 'gate',
 
   // Plan reviews — gate for cheap functional, periodic for Opus quality
   'plan-ceo-review': 'periodic',
@@ -213,7 +213,7 @@ export const E2E_TIERS: Record<string, 'gate' | 'periodic'> = {
   'plan-review-report': 'gate',
 
   // Codex offering verification
-  'codex-offered-office-hours': 'gate',
+  'codex-offered-validate': 'gate',
   'codex-offered-ceo-review': 'gate',
   'codex-offered-design-review': 'gate',
   'codex-offered-eng-review': 'gate',
@@ -226,9 +226,9 @@ export const E2E_TIERS: Record<string, 'gate' | 'periodic'> = {
   'ship-plan-completion': 'gate',
   'ship-plan-verification': 'gate',
 
-  // Retro — gate for cheap branch detection, periodic for full Opus retro
-  'retro': 'periodic',
-  'retro-base-branch': 'gate',
+  // Reflect — gate for cheap branch detection, periodic for full Opus reflect
+  'reflect': 'periodic',
+  'reflect-base-branch': 'gate',
 
   // Global discover
   'global-discover': 'gate',
@@ -269,7 +269,7 @@ export const E2E_TIERS: Record<string, 'gate' | 'periodic'> = {
   'land-and-deploy-workflow': 'gate',
   'land-and-deploy-first-run': 'gate',
   'land-and-deploy-review-gate': 'gate',
-  'canary-workflow': 'gate',
+  'monitor-workflow': 'gate',
   'benchmark-workflow': 'gate',
   'setup-deploy-workflow': 'gate',
 
@@ -278,7 +278,7 @@ export const E2E_TIERS: Record<string, 'gate' | 'periodic'> = {
   'sidebar-url-accuracy': 'periodic',
 
   // Autoplan — periodic (not yet implemented)
-  'autoplan-core': 'periodic',
+  'plan-core': 'periodic',
 
   // Skill routing — periodic (LLM routing is non-deterministic)
   'journey-ideation': 'periodic',
@@ -288,7 +288,7 @@ export const E2E_TIERS: Record<string, 'gate' | 'periodic'> = {
   'journey-code-review': 'periodic',
   'journey-ship': 'periodic',
   'journey-docs': 'periodic',
-  'journey-retro': 'periodic',
+  'journey-reflect': 'periodic',
   'journey-design-system': 'periodic',
   'journey-visual-qa': 'periodic',
 };
@@ -305,7 +305,7 @@ export const LLM_JUDGE_TOUCHFILES: Record<string, string[]> = {
   'qa/SKILL.md workflow':             ['qa/SKILL.md', 'qa/SKILL.md.tmpl'],
   'qa/SKILL.md health rubric':        ['qa/SKILL.md', 'qa/SKILL.md.tmpl'],
   'qa/SKILL.md anti-refusal':         ['qa/SKILL.md', 'qa/SKILL.md.tmpl', 'qa-only/SKILL.md', 'qa-only/SKILL.md.tmpl'],
-  'cross-skill greptile consistency': ['review/SKILL.md', 'review/SKILL.md.tmpl', 'ship/SKILL.md', 'ship/SKILL.md.tmpl', 'review/greptile-triage.md', 'retro/SKILL.md', 'retro/SKILL.md.tmpl'],
+  'cross-skill greptile consistency': ['review/SKILL.md', 'review/SKILL.md.tmpl', 'ship/SKILL.md', 'ship/SKILL.md.tmpl', 'review/greptile-triage.md', 'reflect/SKILL.md', 'reflect/SKILL.md.tmpl'],
   'baseline score pinning':           ['SKILL.md', 'SKILL.md.tmpl', 'test/fixtures/eval-baselines.json'],
 
   // Ship & Release
@@ -322,17 +322,17 @@ export const LLM_JUDGE_TOUCHFILES: Record<string, string[]> = {
   'design-consultation/SKILL.md research': ['design-consultation/SKILL.md', 'design-consultation/SKILL.md.tmpl'],
 
   // Office Hours
-  'office-hours/SKILL.md spec review':    ['office-hours/SKILL.md', 'office-hours/SKILL.md.tmpl', 'scripts/gen-skill-docs.ts'],
-  'office-hours/SKILL.md design sketch':  ['office-hours/SKILL.md', 'office-hours/SKILL.md.tmpl', 'scripts/gen-skill-docs.ts'],
+  'validate/SKILL.md spec review':    ['validate/SKILL.md', 'validate/SKILL.md.tmpl', 'scripts/gen-skill-docs.ts'],
+  'validate/SKILL.md design sketch':  ['validate/SKILL.md', 'validate/SKILL.md.tmpl', 'scripts/gen-skill-docs.ts'],
 
   // Deploy skills
   'land-and-deploy/SKILL.md workflow':    ['land-and-deploy/SKILL.md', 'land-and-deploy/SKILL.md.tmpl'],
-  'canary/SKILL.md monitoring loop':      ['canary/SKILL.md', 'canary/SKILL.md.tmpl'],
+  'monitor/SKILL.md monitoring loop':      ['monitor/SKILL.md', 'monitor/SKILL.md.tmpl'],
   'benchmark/SKILL.md perf collection':   ['benchmark/SKILL.md', 'benchmark/SKILL.md.tmpl'],
   'setup-deploy/SKILL.md platform setup': ['setup-deploy/SKILL.md', 'setup-deploy/SKILL.md.tmpl'],
 
   // Other skills
-  'retro/SKILL.md instructions':          ['retro/SKILL.md', 'retro/SKILL.md.tmpl'],
+  'reflect/SKILL.md instructions':          ['reflect/SKILL.md', 'reflect/SKILL.md.tmpl'],
   'qa-only/SKILL.md workflow':            ['qa-only/SKILL.md', 'qa-only/SKILL.md.tmpl'],
   'pstack-upgrade/SKILL.md upgrade flow': ['pstack-upgrade/SKILL.md', 'pstack-upgrade/SKILL.md.tmpl'],
 

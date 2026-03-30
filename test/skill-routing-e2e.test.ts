@@ -68,8 +68,8 @@ function installSkills(tmpDir: string) {
   const skillDirs = [
     '', // root pstack SKILL.md
     'qa', 'qa-only', 'ship', 'review', 'plan-ceo-review', 'plan-eng-review',
-    'plan-design-review', 'design-review', 'design-consultation', 'retro',
-    'document-release', 'investigate', 'office-hours', 'browse', 'setup-browser-cookies',
+    'plan-design-review', 'design-review', 'design-consultation', 'reflect',
+    'document-release', 'investigate', 'validate', 'browse', 'setup-browser-cookies',
     'pstack-upgrade', 'humanizer',
   ];
 
@@ -176,7 +176,7 @@ describeE2E('Skill Routing E2E — Developer Journey', () => {
     try {
 
       const testName = 'journey-ideation';
-      const expectedSkill = 'office-hours';
+      const expectedSkill = 'validate';
       const result = await runSkillTest({
         prompt: "I've been thinking about building a waitlist management tool for restaurants. The existing solutions are expensive and overcomplicated. I want something simple — a tablet app where hosts can add parties, see wait times, and text customers when their table is ready. Help me think through whether this is worth building and what the key design decisions are.",
         workingDirectory: tmpDir,
@@ -465,8 +465,8 @@ export default app;
     }
   }, 150_000);
 
-  testIfSelected('journey-retro', async () => {
-    const tmpDir = createRoutingWorkDir('retro');
+  testIfSelected('journey-reflect', async () => {
+    const tmpDir = createRoutingWorkDir('reflect');
     try {
       const run = (cmd: string, args: string[]) =>
         spawnSync(cmd, args, { cwd: tmpDir, stdio: 'pipe', timeout: 5000 });
@@ -483,8 +483,8 @@ export default app;
       run('git', ['add', '.']);
       run('git', ['commit', '-m', 'docs: add README', '--date', '2026-03-14T16:00:00']);
 
-      const testName = 'journey-retro';
-      const expectedSkill = 'retro';
+      const testName = 'journey-reflect';
+      const expectedSkill = 'reflect';
       const result = await runSkillTest({
         prompt: "It's Friday. What did we ship this week? I want to do a quick retrospective on what the team accomplished.",
         workingDirectory: tmpDir,

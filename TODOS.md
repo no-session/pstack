@@ -5,10 +5,10 @@
 - [x] Write bootstrapper-focused ETHOS.md
 - [x] Write new README.md
 - [x] Clean package.json, CHANGELOG, VERSION
-- [ ] Adapt /office-hours for solo founder mode (remove YC-specific framing)
+- [ ] Adapt /validate for solo founder mode (remove YC-specific framing)
 - [ ] Adapt /ship for push-to-main workflow (no PR by default)
 - [ ] Adapt /plan-ceo-review to focus on revenue/market validation
-- [ ] Adapt /retro for solo developer (remove team breakdowns, add revenue tracking)
+- [ ] Adapt /reflect for solo developer (remove team breakdowns, add revenue tracking)
 - [ ] Test setup script works end-to-end
 - [ ] Build binaries with bun
 

@@ -254,7 +254,7 @@ Important: The design checklist should catch issues like blacklisted fonts, smal
 
 // --- Base branch detection smoke tests ---
 
-describeIfSelected('Base branch detection', ['review-base-branch', 'ship-base-branch', 'retro-base-branch'], () => {
+describeIfSelected('Base branch detection', ['review-base-branch', 'ship-base-branch', 'reflect-base-branch'], () => {
   let baseBranchDir: string;
   const run = (cmd: string, args: string[], cwd: string) =>
     spawnSync(cmd, args, { cwd, stdio: 'pipe', timeout: 5000 });
@@ -387,8 +387,8 @@ Write a summary to ${dir}/ship-preflight.md including:
     expect(destructiveTools).toHaveLength(0);
   }, 180_000);
 
-  testConcurrentIfSelected('retro-base-branch', async () => {
-    const dir = path.join(baseBranchDir, 'retro-base');
+  testConcurrentIfSelected('reflect-base-branch', async () => {
+    const dir = path.join(baseBranchDir, 'reflect-base');
     fs.mkdirSync(dir, { recursive: true });
 
     // Create git repo with commit history
@@ -408,9 +408,9 @@ Write a summary to ${dir}/ship-preflight.md including:
     run('git', ['add', 'test.ts'], dir);
     run('git', ['commit', '-m', 'test: add tests', '--date', '2026-03-16T11:00:00'], dir);
 
-    // Copy retro skill
-    fs.mkdirSync(path.join(dir, 'retro'), { recursive: true });
-    fs.copyFileSync(path.join(ROOT, 'retro', 'SKILL.md'), path.join(dir, 'retro', 'SKILL.md'));
+    // Copy reflect skill
+    fs.mkdirSync(path.join(dir, 'reflect'), { recursive: true });
+    fs.copyFileSync(path.join(ROOT, 'reflect', 'SKILL.md'), path.join(dir, 'reflect', 'SKILL.md'));
 
     const result = await runSkillTest({
       prompt: `Read retro/SKILL.md for instructions on how to run a retrospective.
@@ -418,25 +418,25 @@ Write a summary to ${dir}/ship-preflight.md including:
 IMPORTANT: Follow the "Detect default branch" step first. Since there is no remote, gh will fail — fall back to main.
 Then use the detected branch name for all git queries.
 
-Run /retro for the last 7 days of this git repo. Skip any AskUserQuestion calls — this is non-interactive.
+Run /reflect for the last 7 days of this git repo. Skip any AskUserQuestion calls — this is non-interactive.
 This is a local-only repo so use the local branch (main) instead of origin/main for all git log commands.
 
-Write your retrospective to ${dir}/retro-output.md`,
+Write your retrospective to ${dir}/reflect-output.md`,
       workingDirectory: dir,
       maxTurns: 25,
       timeout: 240_000,
-      testName: 'retro-base-branch',
+      testName: 'reflect-base-branch',
       runId,
     });
 
-    logCost('/retro base-branch', result);
-    recordE2E(evalCollector, '/retro default branch detection', 'Base branch detection', result, {
+    logCost('/reflect base-branch', result);
+    recordE2E(evalCollector, '/reflect default branch detection', 'Base branch detection', result, {
       passed: ['success', 'error_max_turns'].includes(result.exitReason),
     });
     expect(['success', 'error_max_turns']).toContain(result.exitReason);
 
-    // Verify retro output was produced
-    const retroPath = path.join(dir, 'retro-output.md');
+    // Verify reflect output was produced
+    const retroPath = path.join(dir, 'reflect-output.md');
     if (fs.existsSync(retroPath)) {
       const content = fs.readFileSync(retroPath, 'utf-8');
       expect(content.length).toBeGreaterThan(100);
@@ -446,11 +446,11 @@ Write your retrospective to ${dir}/retro-output.md`,
 
 // --- Retro E2E ---
 
-describeIfSelected('Retro E2E', ['retro'], () => {
+describeIfSelected('Reflect E2E', ['reflect'], () => {
   let retroDir: string;
 
   beforeAll(() => {
-    retroDir = fs.mkdtempSync(path.join(os.tmpdir(), 'skill-e2e-retro-'));
+    retroDir = fs.mkdtempSync(path.join(os.tmpdir(), 'skill-e2e-reflect-'));
     const run = (cmd: string, args: string[]) =>
       spawnSync(cmd, args, { cwd: retroDir, stdio: 'pipe', timeout: 5000 });
 
@@ -486,11 +486,11 @@ describeIfSelected('Retro E2E', ['retro'], () => {
     run('git', ['add', 'README.md']);
     run('git', ['commit', '-m', 'docs: add README', '--date', '2026-03-12T16:00:00']);
 
-    // Copy retro skill
-    fs.mkdirSync(path.join(retroDir, 'retro'), { recursive: true });
+    // Copy reflect skill
+    fs.mkdirSync(path.join(retroDir, 'reflect'), { recursive: true });
     fs.copyFileSync(
-      path.join(ROOT, 'retro', 'SKILL.md'),
-      path.join(retroDir, 'retro', 'SKILL.md'),
+      path.join(ROOT, 'reflect', 'SKILL.md'),
+      path.join(retroDir, 'reflect', 'SKILL.md'),
     );
   });
 
@@ -498,34 +498,34 @@ describeIfSelected('Retro E2E', ['retro'], () => {
     try { fs.rmSync(retroDir, { recursive: true, force: true }); } catch {}
   });
 
-  testConcurrentIfSelected('retro', async () => {
+  testConcurrentIfSelected('reflect', async () => {
     const result = await runSkillTest({
       prompt: `Read retro/SKILL.md for instructions on how to run a retrospective.
 
-Run /retro for the last 7 days of this git repo. Skip any AskUserQuestion calls — this is non-interactive.
-Write your retrospective report to ${retroDir}/retro-output.md
+Run /reflect for the last 7 days of this git repo. Skip any AskUserQuestion calls — this is non-interactive.
+Write your retrospective report to ${retroDir}/reflect-output.md
 
 Analyze the git history and produce the narrative report as described in the SKILL.md.`,
       workingDirectory: retroDir,
       maxTurns: 30,
       timeout: 300_000,
-      testName: 'retro',
+      testName: 'reflect',
       runId,
       model: 'claude-opus-4-6',
     });
 
-    logCost('/retro', result);
-    recordE2E(evalCollector, '/retro', 'Retro E2E', result, {
+    logCost('/reflect', result);
+    recordE2E(evalCollector, '/reflect', 'Reflect E2E', result, {
       passed: ['success', 'error_max_turns'].includes(result.exitReason),
     });
-    // Accept error_max_turns — retro does many git commands to analyze history
+    // Accept error_max_turns — reflect does many git commands to analyze history
     expect(['success', 'error_max_turns']).toContain(result.exitReason);
 
-    // Verify the retro was written
-    const retroPath = path.join(retroDir, 'retro-output.md');
+    // Verify the reflect was written
+    const retroPath = path.join(retroDir, 'reflect-output.md');
     if (fs.existsSync(retroPath)) {
-      const retro = fs.readFileSync(retroPath, 'utf-8');
-      expect(retro.length).toBeGreaterThan(100);
+      const reflectContent = fs.readFileSync(retroPath, 'utf-8');
+      expect(reflectContent.length).toBeGreaterThan(100);
     }
   }, 420_000);
 });
@@ -558,13 +558,13 @@ describeIfSelected('Review Dashboard Via Attribution', ['review-dashboard-via'],
     const headResult = spawnSync('git', ['rev-parse', '--short', 'HEAD'], { cwd: dashDir, stdio: 'pipe' });
     const commit = headResult.stdout.toString().trim();
 
-    // Pre-populate review log with autoplan-sourced entries
+    // Pre-populate review log with plan-sourced entries
     // pstack-review-read reads from ~/.pstack/projects/$SLUG/$BRANCH-reviews.jsonl
     // For the test, we'll write a mock pstack-review-read script that returns our test data
     const timestamp = new Date().toISOString().replace(/\.\d{3}Z$/, 'Z');
     const reviewData = [
-      `{"skill":"plan-eng-review","timestamp":"${timestamp}","status":"clean","unresolved":0,"critical_gaps":0,"issues_found":0,"mode":"FULL_REVIEW","via":"autoplan","commit":"${commit}"}`,
-      `{"skill":"plan-ceo-review","timestamp":"${timestamp}","status":"clean","unresolved":0,"critical_gaps":0,"mode":"SELECTIVE_EXPANSION","via":"autoplan","commit":"${commit}"}`,
+      `{"skill":"plan-eng-review","timestamp":"${timestamp}","status":"clean","unresolved":0,"critical_gaps":0,"issues_found":0,"mode":"FULL_REVIEW","via":"plan","commit":"${commit}"}`,
+      `{"skill":"plan-ceo-review","timestamp":"${timestamp}","status":"clean","unresolved":0,"critical_gaps":0,"mode":"SELECTIVE_EXPANSION","via":"plan","commit":"${commit}"}`,
       `{"skill":"codex-plan-review","timestamp":"${timestamp}","status":"clean","source":"codex","commit":"${commit}"}`,
     ].join('\n');
 
@@ -603,7 +603,7 @@ describeIfSelected('Review Dashboard Via Attribution', ['review-dashboard-via'],
 Instead of running ~/.claude/skills/pstack/bin/pstack-review-read, run this mock: ${mockBinDir}/pstack-review-read
 
 Parse the output and display the dashboard table. Pay attention to:
-1. The "via" field in entries — show source attribution (e.g., "via /autoplan")
+1. The "via" field in entries — show source attribution (e.g., "via /plan")
 2. The codex-plan-review entry — it should populate the Outside Voice row
 3. Since Eng Review IS clear, there should be NO gate blocking — just display the dashboard
 
@@ -634,8 +634,8 @@ Write the dashboard output to ${dashDir}/dashboard-output.md`,
     }
     const combined = allOutput + dashContent;
 
-    // Should mention autoplan attribution
-    expect(combined).toMatch(/autoplan/);
+    // Should mention plan attribution
+    expect(combined).toMatch(/plan/);
     // Should show eng review as CLEAR (it has a clean entry)
     expect(combined).toMatch(/clear/i);
     // Should NOT contain AskUserQuestion gate (no blocking)

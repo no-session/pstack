@@ -20,7 +20,7 @@ The original vision (access user's real browser state) was never implemented. We
 
 ## The Discovery (2026-03-22)
 
-During a `/office-hours` design session, we traced the architecture and discovered:
+During a `/validate` design session, we traced the architecture and discovered:
 
 1. `connectCDP()` doesn't use CDP — it calls `launchPersistentContext()`
 2. `connectionMode: 'cdp'` is misleading — it's just "headed mode"

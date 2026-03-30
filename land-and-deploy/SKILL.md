@@ -4,7 +4,7 @@ preamble-tier: 4
 version: 1.0.0
 description: |
   Land and deploy workflow. Merges the PR, waits for CI and deploy,
-  verifies production health via canary checks. Takes over after /ship
+  verifies production health via monitor checks. Takes over after /ship
   creates the PR. Use when: "merge", "land", "deploy", "merge and verify",
   "land it", "ship it to production".
 allowed-tools:
@@ -251,7 +251,7 @@ Then write a `## PSTACK REVIEW REPORT` section to the end of the plan file:
 | Eng Review | \`/plan-eng-review\` | Architecture & tests (required) | 0 | — | — |
 | Design Review | \`/plan-design-review\` | UI/UX gaps | 0 | — | — |
 
-**VERDICT:** NO REVIEWS YET — run \`/autoplan\` for full review pipeline, or individual reviews above.
+**VERDICT:** NO REVIEWS YET — run \`/plan\` for full review pipeline, or individual reviews above.
 \`\`\`
 
 **PLAN MODE EXCEPTION — ALWAYS RUN:** This writes to the plan file, which is the one
@@ -352,7 +352,7 @@ readiness first.
 - CI failures or merge conflicts
 - Permission denied on merge
 - Deploy workflow failure (offer revert)
-- Production health issues detected by canary (offer revert)
+- Production health issues detected by monitor (offer revert)
 
 **Never stop for:**
 - Choosing merge method (auto-detect from repo settings)
@@ -382,7 +382,7 @@ gh auth status
 ```
 If not authenticated, **STOP**: "I need GitHub CLI access to merge your PR. Run `gh auth login` to connect, then try `/land-and-deploy` again."
 
-2. Parse arguments. If the user specified `#NNN`, use that PR number. If a URL was provided, save it for canary verification in Step 7.
+2. Parse arguments. If the user specified `#NNN`, use that PR number. If a URL was provided, save it for monitor verification in Step 7.
 
 3. If no PR number specified, detect from current branch:
 ```bash
@@ -393,7 +393,7 @@ gh pr view --json number,state,title,url,mergeStateStatus,mergeable,baseRefName,
 
 5. Validate the PR state:
    - If no PR exists: **STOP.** "No PR found for this branch. Run `/ship` first to create a PR, then come back here to land and deploy it."
-   - If `state` is `MERGED`: "This PR is already merged — nothing to deploy. If you need to verify the deploy, run `/canary <url>` instead."
+   - If `state` is `MERGED`: "This PR is already merged — nothing to deploy. If you need to verify the deploy, run `/monitor <url>` instead."
    - If `state` is `CLOSED`: "This PR was closed without merging. Reopen it on GitHub first, then try again."
    - If `state` is `OPEN`: continue.
 
@@ -530,7 +530,7 @@ Run whichever commands are relevant based on the detected platform. Build the re
 ║  2. Wait for CI if pending                                 ║
 ║  3. Merge PR via {merge method}                            ║
 ║  4. {Wait for deploy workflow / Wait 60s / Skip}           ║
-║  5. {Run canary verification / Skip (no URL)}              ║
+║  5. {Run monitor verification / Skip (no URL)}              ║
 ║                                                            ║
 ║  MERGE METHOD: {squash/merge/rebase} (from repo settings)  ║
 ║  MERGE QUEUE:  {detected / not detected}                   ║
@@ -866,7 +866,7 @@ Use AskUserQuestion:
 - C) Merge anyway — I understand the warnings and want to proceed (Completeness: 3/10)
 
 If the user chooses B: **STOP.** Give specific next steps:
-- If reviews are stale: "Run `/review` or `/autoplan` to review the current code, then `/land-and-deploy` again."
+- If reviews are stale: "Run `/review` or `/plan` to review the current code, then `/land-and-deploy` again."
 - If E2E not run: "Run your E2E tests to make sure nothing is broken, then come back."
 - If docs not updated: "Run `/document-release` to update CHANGELOG and docs."
 - If PR body stale: "The PR description doesn't match what's actually in the diff — update it on GitHub."
@@ -992,13 +992,13 @@ echo "FRONTEND=$SCOPE_FRONTEND BACKEND=$SCOPE_BACKEND DOCS=$SCOPE_DOCS CONFIG=$S
 
 **Decision tree (evaluate in order):**
 
-1. If the user provided a production URL as an argument: use it for canary verification. Also check for deploy workflows.
+1. If the user provided a production URL as an argument: use it for monitor verification. Also check for deploy workflows.
 
 2. Check for GitHub Actions deploy workflows:
 ```bash
 gh run list --branch <base> --limit 5 --json name,status,conclusion,headSha,workflowName
 ```
-Look for workflow names containing "deploy", "release", "production", or "cd". If found: poll the deploy workflow in Step 6, then run canary.
+Look for workflow names containing "deploy", "release", "production", or "cd". If found: poll the deploy workflow in Step 6, then run monitor.
 
 3. If SCOPE_DOCS is the only scope that's true (no frontend, no backend, no config): skip verification entirely. Tell the user: "This was a docs-only change — nothing to deploy or verify. You're all set." Go to Step 9.
 
@@ -1023,7 +1023,7 @@ Use AskUserQuestion:
 **If A (staging first):** Tell the user: "Deploying to staging first. I'll run the same health checks I'd run on production — if staging looks good, I'll move on to production automatically."
 
 Run Steps 6-7 against the staging target first. Use the staging
-URL or staging workflow for deploy verification and canary checks. After staging passes,
+URL or staging workflow for deploy verification and monitor checks. After staging passes,
 tell the user: "Staging is healthy — your changes are working. Now deploying to production." Then run
 Steps 6-7 again against the production target.
 
@@ -1082,7 +1082,7 @@ heroku releases --app {app} -n 1 2>/dev/null
 
 ### Strategy C: Auto-deploy platforms (Vercel, Netlify)
 
-Vercel and Netlify deploy automatically on merge. No explicit deploy trigger needed. Wait 60 seconds for the deploy to propagate, then proceed directly to canary verification in Step 7.
+Vercel and Netlify deploy automatically on merge. No explicit deploy trigger needed. Wait 60 seconds for the deploy to propagate, then proceed directly to monitor verification in Step 7.
 
 ### Strategy D: Custom deploy hooks
 
@@ -1109,7 +1109,7 @@ If timeout (20 min): "The deploy has been running for 20 minutes, which is longe
 
 Tell the user: "Deploy is done. Now I'm going to check the live site to make sure everything looks good — loading the page, checking for errors, and measuring performance."
 
-Use the diff-scope classification from Step 5 to determine canary depth:
+Use the diff-scope classification from Step 5 to determine monitor depth:
 
 | Diff Scope | Canary Depth |
 |------------|-------------|
@@ -1117,9 +1117,9 @@ Use the diff-scope classification from Step 5 to determine canary depth:
 | SCOPE_CONFIG only | Smoke: `$B goto` + verify 200 status |
 | SCOPE_BACKEND only | Console errors + perf check |
 | SCOPE_FRONTEND (any) | Full: console + perf + screenshot |
-| Mixed scopes | Full canary |
+| Mixed scopes | Full monitor |
 
-**Full canary sequence:**
+**Full monitor sequence:**
 
 ```bash
 $B goto <url>
@@ -1246,7 +1246,7 @@ mkdir -p ~/.pstack/projects/$SLUG
 
 Write a JSONL entry with timing data:
 ```json
-{"skill":"land-and-deploy","timestamp":"<ISO>","status":"<SUCCESS/REVERTED>","pr":<number>,"merge_sha":"<sha>","merge_path":"<auto/direct/queue>","first_run":<true/false>,"deploy_status":"<HEALTHY/DEGRADED/SKIPPED>","staging_status":"<VERIFIED/SKIPPED>","review_status":"<CURRENT/STALE/NOT_RUN/INLINE_FIX>","ci_wait_s":<N>,"queue_s":<N>,"deploy_s":<N>,"staging_s":<N>,"canary_s":<N>,"total_s":<N>}
+{"skill":"land-and-deploy","timestamp":"<ISO>","status":"<SUCCESS/REVERTED>","pr":<number>,"merge_sha":"<sha>","merge_path":"<auto/direct/queue>","first_run":<true/false>,"deploy_status":"<HEALTHY/DEGRADED/SKIPPED>","staging_status":"<VERIFIED/SKIPPED>","review_status":"<CURRENT/STALE/NOT_RUN/INLINE_FIX>","ci_wait_s":<N>,"queue_s":<N>,"deploy_s":<N>,"staging_s":<N>,"monitor_s":<N>,"total_s":<N>}
 ```
 
 ---
@@ -1262,7 +1262,7 @@ If verdict is DEPLOYED (UNVERIFIED): Tell the user "Your changes are merged and 
 If verdict is REVERTED: Tell the user "The merge was reverted. Your changes are no longer on {base}. The PR branch is still available if you need to fix and re-ship."
 
 Then suggest relevant follow-ups:
-- If a production URL was verified: "Want extended monitoring? Run `/canary <url>` to watch the site for the next 10 minutes."
+- If a production URL was verified: "Want extended monitoring? Run `/monitor <url>` to watch the site for the next 10 minutes."
 - If performance data was collected: "Want a deeper performance analysis? Run `/benchmark <url>`."
 - "Need to update docs? Run `/document-release` to sync README, CHANGELOG, and other docs with what you just shipped."
 
@@ -1276,7 +1276,7 @@ Then suggest relevant follow-ups:
 - **Auto-detect everything.** PR number, merge method, deploy strategy, project type, merge queues, staging environments. Only ask when information genuinely can't be inferred.
 - **Poll with backoff.** Don't hammer GitHub API. 30-second intervals for CI/deploy, with reasonable timeouts.
 - **Revert is always an option.** At every failure point, offer revert as an escape hatch. Explain what reverting does in plain English.
-- **Single-pass verification, not continuous monitoring.** `/land-and-deploy` checks once. `/canary` does the extended monitoring loop.
+- **Single-pass verification, not continuous monitoring.** `/land-and-deploy` checks once. `/monitor` does the extended monitoring loop.
 - **Clean up.** Delete the feature branch after merge (via `--delete-branch`).
 - **First run = teacher mode.** Walk the user through everything. Explain what each check does and why it matters. Show them their infrastructure. Let them confirm before proceeding. Build trust through transparency.
 - **Subsequent runs = efficient mode.** Brief status updates, no re-explanations. The user already trusts the tool — just do the job and report results.

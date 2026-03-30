@@ -330,7 +330,7 @@ Then write a \`## PSTACK REVIEW REPORT\` section to the end of the plan file:
 | Eng Review | \\\`/plan-eng-review\\\` | Architecture & tests (required) | 0 | — | — |
 | Design Review | \\\`/plan-design-review\\\` | UI/UX gaps | 0 | — | — |
 
-**VERDICT:** NO REVIEWS YET — run \\\`/autoplan\\\` for full review pipeline, or individual reviews above.
+**VERDICT:** NO REVIEWS YET — run \\\`/plan\\\` for full review pipeline, or individual reviews above.
 \\\`\\\`\\\`
 
 **PLAN MODE EXCEPTION — ALWAYS RUN:** This writes to the plan file, which is the one
@@ -405,8 +405,8 @@ Avoid filler, throat-clearing, generic optimism, founder cosplay, and unsupporte
 //
 // Skills by tier:
 //   T1: browse, setup-cookies, benchmark
-//   T2: investigate, cso, retro, doc-release, setup-deploy, canary
-//   T3: autoplan, codex, design-consult, office-hours, ceo/design/eng-review
+//   T2: investigate, cso, reflect, doc-release, setup-deploy, monitor
+//   T3: plan, codex, design-consult, validate, ceo/design/eng-review
 //   T4: ship, review, qa, qa-only, design-review, land-deploy
 export function generatePreamble(ctx: TemplateContext): string {
   const tier = ctx.preambleTier ?? 4;
